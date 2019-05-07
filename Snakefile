@@ -6,11 +6,11 @@ configfile: "wbuild.yaml"
 
 subworkflow standardFileNames:
     workdir:
-        "../../../sample_annotation"
+        "../sample_annotation"
     snakefile:
-        "../../../sample_annotation/Snakefile"
+        "../sample_annotation/Snakefile"
     configfile:
-        "../../../sample_annotation/wbuild.yaml"
+        "../sample_annotation/wbuild.yaml"
 
 
 

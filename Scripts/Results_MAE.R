@@ -22,9 +22,10 @@ suppressPackageStartupMessages({
     library(ggplot2)
     library(cowplot)
     library(tidyr)
+    devtools::load_all("../genetic-diagnosis-tools")
 })
 
-source("Scripts/_functions/gene_annotation/add_gene_info_cols.R")
+#source("Scripts/_functions/gene_annotation/add_gene_info_cols.R")
 
 #' ## Read all mae files
 res <- lapply(snakemake@input$mae_res, function(m){

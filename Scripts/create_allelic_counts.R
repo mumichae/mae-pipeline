@@ -17,9 +17,10 @@ saveRDS(snakemake, 'tmp/mae.Rds')
 suppressPackageStartupMessages({
     devtools::load_all("../mae/")
     library(VariantAnnotation)
+    devtools::load_all("../genetic-diagnosis-tools")
 })
 
-source("Scripts/_functions/filter_sets.R")
+#source("Scripts/_functions/filter_sets.R")
 vcfs <- snakemake@input$vcf
 rnas <- snakemake@input$rna
 

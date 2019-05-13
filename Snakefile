@@ -11,7 +11,16 @@ subworkflow standardFileNames:
         "../sample_annotation/Snakefile"
     configfile:
         "../sample_annotation/wbuild.yaml"
+        
 
+subworkflow variantsPipeline:
+    workdir:
+        "../variant-annotation-pipeline"
+    snakefile:
+        "../variant-annotation-pipeline/Snakefile"
+    configfile:
+        "../variant-annotation-pipeline/wbuild.yaml"
+        
 
 
 def outrider_files(sa_file = config["SAMPLE_ANNOTATION"]):

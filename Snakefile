@@ -6,15 +6,6 @@ from config_helper import ConfigHelper
 configfile: "wbuild.yaml" 
 parser = ConfigHelper(config)
 
-subworkflow standardFileNames:
-    workdir:
-        "../sample_annotation"
-    snakefile:
-        "../sample_annotation/Snakefile"
-    configfile:
-        "../sample_annotation/wbuild.yaml"
-
-        
 subworkflow variantsPipeline:
     workdir:
         "../variant-annotation-pipeline"

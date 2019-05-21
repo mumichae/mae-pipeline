@@ -25,7 +25,7 @@ subworkflow variantsPipeline:
         
         
 ## Needed for MAE: set config variables for mae
-vcfs, rnas = parser.getMaeFiles()
+vcfs, rnas = parser.getMaeIDs()
 config["vcfs"] = vcfs
 config["rnas"] = rnas
 config["mae_ids"] = list(map('-'.join, zip(vcfs, rnas)))

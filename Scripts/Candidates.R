@@ -3,8 +3,8 @@
 #' author: mumichae
 #' wb:
 #'  input:
-#'   - res_signif_all: '`sm config["PROC_RESULTS"] + "/mae/MAE_results.Rds"`'
-#'   - res_signif_rare: '`sm config["PROC_RESULTS"] + "/mae/MAE_results_rare.Rds"`'
+#'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`'
+#'   - res_signif_rare: '`sm parser.getProcResultsDir() + "/mae/MAE_results_rare.Rds"`'
 #' output: 
 #'   html_document:
 #'    code_folding: show
@@ -30,7 +30,7 @@ res_rare <- readRDS(snakemake@input$res_signif_rare)
 DT::datatable(res_rare[!is.na(HANS_CLASS) & is.na(KNOWN_MUTATION)], caption = "Unsolved mitodisease MAE results", style = 'bootstrap')
 
 
-get_total_mae_result <- function(sa, rna_id = NULL, exome_id = NULL, dir = "/s/project/genetic_diagnosis/processed_results/mae/samples") {
+get_total_mae_result <- function(sa, rna_id = NULL, exome_id = NULL, dir = paste0(snakemake@config["PROC_RESULTS"], "/mae/samples")) {
     if (!is.null(rna_id)){
         ids <- sa[RNA_ID == rna_id, .(RNA_ID, EXOME_ID)]
     } else if (!is.null(exome_id)) {
@@ -77,7 +77,7 @@ plot_volcano <- function(mae_res_dt, interactive = T, patient_id = NULL) {
 
 sa <- fread(snakemake@config$SAMPLE_ANNOTATION)
 #+ volcanos, fig.height=8, fig.width=10
-total_res_MUC1404 <- readRDS("/s/project/genetic_diagnosis/processed_results/mae/samples/65990-MUC1404_res.Rds")
+total_res_MUC1404 <- readRDS(paste0(snakemake@config["PROC_RESULTS"], "/mae/samples/65990-MUC1404_res.Rds"))
 plot_volcano(total_res_MUC1404, interactive = T, patient_id = '#80256')
 plot_volcano(get_total_mae_result(sa, rna_id = '103170R'), interactive = T)
 

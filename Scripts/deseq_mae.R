@@ -3,10 +3,10 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_counts: '`sm config["PROC_DATA"] + "/mae/{vcf}-{rna}.Rds"`'
+#'   - mae_counts: '`sm parser.getProcDataDir() + "/mae/{vcf}-{rna}.Rds"`'
 #'   - vcf_uniqs: '`sm variantsPipeline(config["RAW_DATA"] + "/{vcf}/exomicout/paired-endout/processedData/vep_anno_{vcf}_uniq_dt.Rds")`'
 #'  output:
-#'   - mae_res: '`sm config["PROC_RESULTS"] + "/mae/samples/{vcf}-{rna}_res.Rds"`'
+#'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/samples/{vcf}-{rna}_res.Rds"`'
 #'  type: script
 #'---
 

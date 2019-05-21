@@ -3,8 +3,8 @@
 #' author: vyepez, mumichae
 #' wb:
 #'  input:
-#'   - maes: '`sm expand(config["PROC_DATA"] + "/mae/{id}.Rds", id = config["mae_ids"])`'
-#'   - mae_res: '`sm config["PROC_RESULTS"] + "/mae/MAE_results.Rds"`'
+#'   - maes: '`sm expand(parser.getProcDataDir() + "/mae/{id}.Rds", id = config["mae_ids"])`'
+#'   - mae_res: '`sm parser.getProcReultsDir() + "/mae/MAE_results.Rds"`'
 #'  output:
 #'  threads: 40
 #' output: 

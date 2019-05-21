@@ -3,10 +3,10 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_res: '`sm expand(config["PROC_RESULTS"] + "/mae/samples/{id}_res.Rds", id = config["mae_ids"])`'
+#'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = config["mae_ids"])`'
 #'  output:
-#'   - res_signif_all: '`sm config["PROC_RESULTS"] + "/mae/MAE_results.Rds"`'
-#'   - res_signif_rare: '`sm config["PROC_RESULTS"] + "/mae/MAE_results_rare.Rds"`'
+#'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`'
+#'   - res_signif_rare: '`sm parser.getProcResultsDir() + "/mae/MAE_results_rare.Rds"`'
 #' output: 
 #'   html_document:
 #'    code_folding: show
@@ -146,7 +146,7 @@ saveRDS(res, snakemake@output$res_signif_all)
 saveRDS(res_rare, snakemake@output$res_signif_rare)
 
 #' ### Download results tables
-write.table(res_rare, "/s/public_webshare/project/genetic_diagnosis/results/MAE_results_rare.tsv", sep = "\t", quote = F, row.names = F)
+write.table(res_rare, paste0(snakemake@config["webDir"], "/results/MAE_results_rare.tsv"), sep = "\t", quote = F, row.names = F)
 
 #' [Download MAE rare results table](https://i12g-gagneurweb.informatik.tu-muenchen.de/project/genetic_diagnosis/results/MAE_results_rare.tsv)
 DT::datatable(res_rare, caption = "MAE results", style = 'bootstrap', filter = 'top')

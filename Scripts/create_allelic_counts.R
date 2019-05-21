@@ -3,13 +3,16 @@
 #' author: mumichae
 #' wb:
 #'  input:
-#'   - vcf: '`sm standardFileNames("Data/helmholtz/{vcf}/exomicout/paired-endout/stdFilenames/{vcf}.vcf.gz")`'
-#'   - rna: '`sm standardFileNames("Data/helmholtz/{rna}/RNAout/paired-endout/stdFilenames/{rna}.bam")`'
+#'   - vcf: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=config["dna_assay"]) `'
+#'   - rna: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay=config["rna_assay"])`'
 #'  output:
-#'   - mae: '`sm config["PROC_DATA"] + "/mae/{vcf}-{rna}.Rds"`'
+#'   - mae: '`sm parser.getProcDataDir() + "/mae/{vcf}-{rna}.Rds"`'
 #'  threads: 1
 #'  type: script
 #'---
+
+# #'   - vcf: '`sm standardFileNames("Data/helmholtz/{vcf}/exomicout/paired-endout/stdFilenames/{vcf}.vcf.gz")`'
+# #'   - rna: '`sm standardFileNames("Data/helmholtz/{rna}/RNAout/paired-endout/stdFilenames/{rna}.bam")`'
 
 saveRDS(snakemake, 'tmp/mae.Rds')
 # snakemake <-  readRDS('tmp/mae.Rds')

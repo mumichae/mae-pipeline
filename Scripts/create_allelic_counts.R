@@ -3,8 +3,8 @@
 #' author: mumichae
 #' wb:
 #'  input:
-#'   - vcf: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=config["dna_assay"]) `'
-#'   - rna: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay=config["rna_assay"])`'
+#'   - vcf: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay="dna_assay") `'
+#'   - rna: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay="rna_assay")`'
 #'  output:
 #'   - mae: '`sm parser.getProcDataDir() + "/mae/{vcf}-{rna}.Rds"`'
 #'  threads: 1

@@ -30,4 +30,9 @@ htmlOutputPath = "Output/html"
 rule all:
     input: rules.Index.output, htmlOutputPath + "/readme.html"
     output: touch("Output/all.done")
+    
+# overwriting wbuild rule output
+rule rulegraph:
+    shell: "snakemake --rulegraph | dot -Tsvg -Grankdir=TB > {config[htmlOutputPath]}/dep.svg"
+
 

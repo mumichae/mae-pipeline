@@ -3,10 +3,9 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_counts: '`sm parser.getProcDataDir() + "/mae/{vcf}-{rna}.Rds"`'
-#'   - vcf_uniqs: '`sm variantsPipeline(config["RAW_DATA"] + "/{vcf}/exomicout/paired-endout/processedData/vep_anno_{vcf}_uniq_dt.Rds")`'
+#'   - mae_counts: '`sm parser.getProcDataDir() + "/mae/{vcf}--{rna}.Rds"`'
 #'  output:
-#'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/samples/{vcf}-{rna}_res.Rds"`'
+#'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/samples/{vcf}--{rna}_res.Rds"`'
 #'  type: script
 #'---
 
@@ -20,6 +19,15 @@ suppressPackageStartupMessages({
     library(magrittr)
     library(tidyr)
 })
+
+
+
+
+# Deleted from input:
+# #'   - vcf_uniqs: '`sm variantsPipeline(config["RAW_DATA"] + "/{vcf}/exomicout/paired-endout/processedData/vep_anno_{vcf}_uniq_dt.Rds")`'
+
+
+
 
 mae_raw <- readRDS(snakemake@input$mae_counts)
 

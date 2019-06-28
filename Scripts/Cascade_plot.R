@@ -4,7 +4,7 @@
 #' wb:
 #'  input:
 #'   - maes: '`sm expand(parser.getProcDataDir() + "/mae/{id}.Rds", id = config["mae_ids"])`'
-#'   - mae_res: '`sm parser.getProcReultsDir() + "/mae/MAE_results.Rds"`'
+#'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`'
 #'  output:
 #'  threads: 40
 #' output: 

@@ -3,7 +3,7 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = config["mae_ids"])`'
+#'   - mae_res: '`sm expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = config["mae_ids"])`'
 #'  output:
 #'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`'
 #'   - res_signif_rare: '`sm parser.getProcResultsDir() + "/mae/MAE_results_rare.Rds"`'

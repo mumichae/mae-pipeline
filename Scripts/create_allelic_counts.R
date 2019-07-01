@@ -18,7 +18,7 @@ saveRDS(snakemake, 'tmp/mae.Rds')
 snakemake <-  readRDS('tmp/mae.Rds')
 
 suppressPackageStartupMessages({
-    devtools::load_all("../mae/") ########### ADD THIS TO genetic-diagnosis-tools
+    devtools::load_all("mae/") ########### ADD THIS TO genetic-diagnosis-tools
     library(VariantAnnotation)
     devtools::load_all("../genetic-diagnosis-tools")
 })

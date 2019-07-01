@@ -17,7 +17,7 @@
 saveRDS(snakemake, 'tmp/cascade_mae.Rds')
 # snakemake <- readRDS('tmp/cascade_mae.Rds')
 suppressPackageStartupMessages({
-    devtools::load_all("../mae/")
+    devtools::load_all("mae/")
     library(ggplot2)
     library(cowplot)
     library(ggpubr)

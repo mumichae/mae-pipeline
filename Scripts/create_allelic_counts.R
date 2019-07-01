@@ -11,8 +11,6 @@
 #'  type: script
 #'---
 
-# #'   - vcf: '`sm standardFileNames("Data/helmholtz/{vcf}/exomicout/paired-endout/stdFilenames/{vcf}.vcf.gz")`'
-# #'   - rna: '`sm standardFileNames("Data/helmholtz/{rna}/RNAout/paired-endout/stdFilenames/{rna}.bam")`'
 
 saveRDS(snakemake, 'tmp/mae.Rds')
 snakemake <-  readRDS('tmp/mae.Rds')
@@ -23,7 +21,6 @@ suppressPackageStartupMessages({
     devtools::load_all("../genetic-diagnosis-tools")
 })
 
-#source("Scripts/_functions/filter_sets.R")
 vcfs <- snakemake@input$vcf
 rnas <- snakemake@input$rna
 

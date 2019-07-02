@@ -4,23 +4,7 @@ from config_parser import ConfigHelper
 
 parser = ConfigHelper(config)
 
-subworkflow variantsPipeline:
-    workdir:
-        "../variant-annotation-pipeline"
-    snakefile:
-        "../variant-annotation-pipeline/Snakefile"
-    configfile:
-        "../variant-annotation-pipeline/wbuild.yaml"
-        
-        
-## Needed for MAE: set config variables for mae
-vcfs, rnas = parser.getMaeIDs()
-config["vcfs"] = vcfs
-config["rnas"] = rnas
-config["mae_ids"] = list(map('--'.join, zip(vcfs, rnas)))
-print(config["mae_ids"])
-
-
+ 
 include: ".wBuild/wBuild.snakefile"  # Has to be here in order to update the config with the new variables
 #htmlOutputPath = config["htmlOutputPath"]  if (config["htmlOutputPath"] != None) else "Output/html"
 htmlOutputPath = "Output/html"
@@ -38,4 +22,4 @@ rule rulegraph:
     shell: "snakemake --rulegraph | dot -Tsvg -Grankdir=TB > {config[htmlOutputPath]}/dep.svg"
 
 rule allelic_counts:
-    input: expand(parser.getProcDataDir() + "/mae/{id}.Rds", id=config["mae_ids"])
+    input: expand(parser.getProcDataDir() + "/mae/{id}.Rds", id=parser.getMaeIDs())

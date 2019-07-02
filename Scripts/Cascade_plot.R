@@ -3,7 +3,7 @@
 #' author: vyepez, mumichae
 #' wb:
 #'  input:
-#'   - maes: '`sm expand(parser.getProcDataDir() + "/mae/{id}.Rds", id = config["mae_ids"])`'
+#'   - maes: '`sm expand(parser.getProcDataDir() + "/mae/{id}.Rds", id = parser.getMaeIDs())`'
 #'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`'
 #'  output:
 #'  threads: 40

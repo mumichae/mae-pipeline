@@ -1,9 +1,7 @@
 import sys
 # Add the folder path for the python parsing functions to the sys.path list
-sys.path.insert(0,'../genetic_diagnosis_modified/src/python') 
-from config_helper import ConfigHelper
+from config_parser import ConfigHelper
 
-configfile: "wbuild.yaml" 
 parser = ConfigHelper(config)
 
 subworkflow variantsPipeline:

@@ -4,3 +4,6 @@ Output/
 tmp/
 .wBuild.depend
 *.Rproj*
+.Rhistory
+
+.Rproj.user

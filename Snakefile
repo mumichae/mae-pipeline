@@ -24,7 +24,7 @@ rule rulegraph:
 
 rule allelic_counts: 
     input:
-        vcf=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay_name="dna_assay"),
+        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay_name="dna_assay"),
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay_name="rna_assay")
     params:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
@@ -32,7 +32,7 @@ rule allelic_counts:
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:
-        "bcftools annotate -O b -x INFO {input.vcf} | bcftools view -s 85154 -m2 -M2 -v snps -O z > {params.snps_filename}; "
+        "bcftools annotate -O b -x INFO {input.vcf_file} | bcftools view -s {vcf} -m2 -M2 -v snps -O z > {params.snps_filename}; "
         "bcftools index -t {params.snps_filename}; "
         "gatk ASEReadCounter -R {config[genome]} -I {input.bam} -V {params.snps_filename} {params.chrNames} | gzip > {output.counted}"
         

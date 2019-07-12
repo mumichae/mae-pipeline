@@ -3,9 +3,9 @@
 #' author: salazar, figueira
 #' wb:
 #'  input:
-#'   - vcf: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay_name="dna_assay") `'
+#'   - vcf: '`sm lambda wildcards: parser.getProcDataDir() + "/mae/temp_processed_{vcf}.vcf.gz"`'
 #'  output:
-#'   - invalidIntervals: '`sm parser.getProcDataDir() + "/mae/invalid_intervals_{vcf}.vcf.gz"`'
+#'   - invalidIntervals: '`sm parser.getProcDataDir() + "/mae/{vcf}_invalid.intervals"`'
 #'  threads: 1
 #'  type: script
 #'---

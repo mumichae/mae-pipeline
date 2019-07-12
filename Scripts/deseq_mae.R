@@ -3,7 +3,7 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_counts: '`sm parser.getProcDataDir() + "/mae/{vcf}--{rna}.Rds"`'
+#'   - mae_counts: '`sm parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz" `'
 #'  output:
 #'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/samples/{vcf}--{rna}_res.Rds"`'
 #'  type: script

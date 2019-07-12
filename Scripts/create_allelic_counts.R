@@ -3,7 +3,7 @@
 #' author: mumichae
 #' wb:
 #'  input:
-#'   - vcf: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf) `'
+#'   - vcf: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay_name="dna_assay") `'
 #'   - rna: '`sm lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay_name="rna_assay")`'
 #'  output:
 #'   - mae: '`sm parser.getProcDataDir() + "/mae/{vcf}--{rna}.Rds"`'

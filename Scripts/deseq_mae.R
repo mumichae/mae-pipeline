@@ -21,32 +21,10 @@ suppressPackageStartupMessages({
 })
 
 
-
-
-# Deleted from input:
-# #'   - vcf_uniqs: '`sm variantsPipeline(config["RAW_DATA"] + "/{vcf}/exomicout/paired-endout/processedData/vep_anno_{vcf}_uniq_dt.Rds")`'
-
-
-
-
 mae_raw <- readRDS(snakemake@input$mae_counts)
-
 # Function from MAE pkg
-rmae <- run_deseq_all_mae(mae_raw)
+rmae <- run_deseq_all_mae(mae_raw) ## build test for counting REF and ALT in MAE
+print("Done with deseq")
+saveRDS(rt, snakemake@output$rmae)
 
-# Make an aux column for merging
-rmae[, aux := paste(chr, pos, REF, ALT, sep = "-")]
 
-# Read vcf annotated file with 1 row / variant
-vt <- readRDS(snakemake@input$vcf_uniqs)
-vt[, chr := paste0("chr", chr)]
-vt[, aux := paste(chr, pos, ref, alt, sep = "-")]
-
-# Merge results
-rt <- left_join(rmae, vt[,.(hgncid, mstype, noccds, sift1, pph1, CADD_phred, CADD_raw, exonic,
-                            MAX_AF, gnomAD_AF, AF, gnomAD_NFE_AF, gnomAD_AFR_AF, gnomAD_EAS_AF, gnomAD_AMR_AF, gnomAD_ASJ_AF, gnomAD_SAS_AF,
-                            rsid, pubmed, aux)], by = "aux") %>% as.data.table
-rt[, aux := NULL]
-
-# Save results
-saveRDS(rt, snakemake@output$mae_res)

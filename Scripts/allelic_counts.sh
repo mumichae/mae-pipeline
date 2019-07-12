@@ -14,6 +14,6 @@ gatk ASEReadCounter -R $3 \
 # 3: genome
 # 4: bam
 # 5: output: counted
-#6: List of chromosome names 
+# 6: List of chromosome names 
  
  

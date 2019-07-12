@@ -1,5 +1,5 @@
 #!/bin/bash
-declare -a chromosomeNames=($6)
+declare -a chromosomeNames=$6
 
 bcftools annotate -O b -x INFO $1 | bcftools view -s 85154  -m2 -M2 -v snps -O z > $2
 bcftools index -t $2

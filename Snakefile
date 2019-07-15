@@ -22,9 +22,16 @@ rule rulegraph:
     shell: "snakemake --rulegraph | dot -Tsvg -Grankdir=TB > {config[htmlOutputPath]}/dep.svg"
 
 
+# create folders for mae results
+dirs = [parser.getProcDataDir() + "/mae/snps", parser.getProcDataDir() + "/mae/allelic_counts"]
+for dir in dirs:
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+        print("Created directory for MAE results: ", dir)
+        
 rule allelic_counts: 
     input:
-        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay_name="dna_assay"),
+        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay_name="wes_assay"),
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay_name="rna_assay")
     params:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
@@ -32,7 +39,7 @@ rule allelic_counts:
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:
-        "bcftools annotate -O b -x INFO {input.vcf_file} | bcftools view -s {vcf} -m2 -M2 -v snps -O z > {params.snps_filename}; "
+        "bcftools annotate -O b -x INFO {input.vcf_file} | bcftools view -s {wildcards.vcf} -m2 -M2 -v snps -O z > {params.snps_filename}; "
         "bcftools index -t {params.snps_filename}; "
         "gatk ASEReadCounter -R {config[genome]} -I {input.bam} -V {params.snps_filename} {params.chrNames} | gzip > {output.counted}"
         

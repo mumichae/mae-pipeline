@@ -21,10 +21,11 @@ suppressPackageStartupMessages({
 })
 
 
-mae_raw <- readRDS(snakemake@input$mae_counts)
+mae_raw <- fread(snakemake@input$mae_counts)
 # Function from MAE pkg
-rmae <- run_deseq_all_mae(mae_raw) ## build test for counting REF and ALT in MAE
-print("Done with deseq")
-saveRDS(rt, snakemake@output$rmae)
+#rmae <- run_deseq_all_mae(mae_raw) ## build test for counting REF and ALT in MAE
+#print("Done with deseq")
+rmae <- mae_raw
+saveRDS(rmae, snakemake@output$rmae)
 
 

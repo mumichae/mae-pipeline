@@ -28,11 +28,11 @@ for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
         print("Created directory for MAE results: ", dir)
-        
+print(parser.getMaeIDs())       
 rule allelic_counts: 
     input:
-        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay_name="wes_assay"),
-        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay_name="rna_assay")
+        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, isRNA=False),
+        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, isRNA=True)
     params:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))

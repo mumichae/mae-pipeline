@@ -25,8 +25,9 @@ mae_raw <- fread(snakemake@input$mae_counts)
 mae_raw[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]
 # Function from MAE pkg
 rmae <- run_deseq_all_mae(mae_raw) ## build test for counting REF and ALT in MAE
+
 print("Done with deseq")
 
-saveRDS(rmae, snakemake@output$rmae)
+saveRDS(rmae, snakemake@output$mae_res)
 
 

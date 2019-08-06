@@ -3,15 +3,19 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_res: '`sm expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = parser.getMaeIDs())`'
+#'   - mae_res: '`sm expand(parser.getProcResultsDir() + "/mae/samplesNEW/{id}_res.Rds", id = parser.getMaeIDs())`'
 #'  output:
-#'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`'
-#' output: 
-#'   html_document:
-#'    code_folding: show
-#'    code_download: TRUE
+#'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`' 
+#'  type: script
 #'---
 
+# #' output: 
+# #'   html_document:
+# #'    code_folding: show
+# #'    code_download: TRUE
+# #'---
+
+print("BUILD RESULTS FOR MAE")
 #+ echo=F
 saveRDS(snakemake, 'tmp/mae_res_all.Rds')
 # snakemake <- readRDS('tmp/mae_res_all.Rds')

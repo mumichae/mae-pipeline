@@ -3,29 +3,30 @@
 import os
 from config_parser import ConfigHelper
 
-#print(config)
-parser = ConfigHelper(config)
-config = parser.config # needed if you dont provide the wbuild.yaml as configfile
-htmlOutputPath = config["htmlOutputPath"] 
-
-include: os.getcwd() + "/.wBuild/wBuild.snakefile"
-# create temporary folder
+## ADD tmp/ DIR
 if not os.path.exists('tmp'):
     os.makedirs('tmp')
 
-# create folders for mae results
+print("In MAE", config)
+parser = ConfigHelper(config)
+config = parser.config # needed if you dont provide the wbuild.yaml as configfile
+htmlOutputPath = config["htmlOutputPath"]
+include: os.getcwd() + "/.wBuild/wBuild.snakefile" 
+
+# create folders for mae results for rule allelic counts
 dirs = [parser.getProcDataDir() + "/mae/snps", parser.getProcDataDir() + "/mae/allelic_counts"]
 for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
         print("Created directory for MAE results: ", dir)
         
-        
-
+#rule all:
+#    input: rules.Index.output, htmlOutputPath + "/readme.html"
+#    output: touch("Output/all.done")
+ 
 rule all:
-    input: rules.Index.output, htmlOutputPath + "/readme.html"
-    output: touch("Output/all.done")
-    
+    input: parser.getProcResultsDir() + "/mae/MAE_results.Rds"
+    output: touch("Output/all.done")   
     
 # overwriting wbuild rule output
 rule rulegraph:

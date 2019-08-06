@@ -39,7 +39,7 @@ rule allelic_counts:
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:
-        "bcftools annotate -O b -x INFO {input.vcf_file} | bcftools view -s {wildcards.vcf} -m2 -M2 -v snps -O z > {params.snps_filename}; "
+        "bcftools annotate --force -x INFO {input.vcf_file} | bcftools view -s {wildcards.vcf} -m2 -M2 -v snps -O z -o {params.snps_filename}; "
         "bcftools index -t {params.snps_filename}; "
         "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam} -V {params.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
         
@@ -48,17 +48,17 @@ rule allelic_counts:
         
 rule test_allelic_counts: 
     input:
-        vcf="/s/project/mitoMultiOmics/raw_data/helmholtz/33281/exomicout/paired-endout/stdFilenames/33281.vcf.gz",
-        bam="/s/project/mitoMultiOmics/raw_data/helmholtz/MUC1343/RNAout/paired-endout/stdFilenames/MUC1343.bam"
+        vcf_file="/s/project/sra-download/files/dbGaP-11206/phg000830.v1.GTEx_WGS.genotype-calls-vcf.c1/temp_gtex",
+        bam="/s/project/sra-download/bamfiles/SRR1314810.bam"
     params:
-        snps_filename="tmp/33281--MUC1343.vcf.gz",
+        snps_filename="/s/project/gtex_genetic_diagnosis/processed_data/mae/snps/test_GTEX-13RTJ--SRR1314810.vcf.gz",
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))
     output:    
-        counted="tmp/counted_33281--MUC1343.csv.gz"
+        counted="/s/project/gtex_genetic_diagnosis/processed_data/mae/allelic_counts/test_GTEX-13RTJ--SRR1314810.csv.gz"
     shell:
-        "bcftools annotate -O b -x INFO /s/project/mitoMultiOmics/raw_data/helmholtz/33281/exomicout/paired-endout/stdFilenames/33281.vcf.gz | bcftools view -s 33281  -m2 -M2 -v snps -O z > 33281--MUC1343.vcf.gz; "
-        "bcftools index -t 33281--MUC1343.vcf.gz; "
-        "gatk ASEReadCounter -R /s/genomes/human/hg19/fasta/hg19.fa -I /s/project/mitoMultiOmics/raw_data/helmholtz/MUC1343/RNAout/paired-endout/stdFilenames/MUC1343.bam -V 33281--MUC1343.vcf.gz -L chr1 -L chr2 -L chr3 -L chr4 -L chr5 -L chr6 -L chr7 -L chr8 -L chr9 -L chr10 -L chr11 -L chr12 -L chr13 -L chr14 -L chr15 -L chr16 -L chr17 -L chr18 -L chr19 -L chr20 -L chr21 -L chr22 -L chrX -L chrY | gzip > counted_33281--MUC1343.csv.gz"
+        "bcftools annotate --force -x INFO {input.vcf_file} | bcftools view -s GTEX-13RTJ -m2 -M2 -v snps -O z -o {params.snps_filename}; "
+        "bcftools index -t {params.snps_filename}; "
+        "gatk ASEReadCounter -R /s/genomes/human/hg19/fasta/Homo_sapiens_assembly19_GTEx.fasta -I {input.bam} -V {params.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
 
 
 

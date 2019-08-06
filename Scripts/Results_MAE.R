@@ -29,18 +29,11 @@ suppressPackageStartupMessages({
 ## Read all mae files
 res <- lapply(snakemake@input$mae_res, function(m){
     rt <- readRDS(m)
-    # HARDCODED
-    #rt <- rt[padj < .05 & alt_freq > .8]
     return(rt)
 }) %>% rbindlist()
 
 res <- separate(res, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
 res[, c('GT', 'as_gt') := NULL] ## Do we need this?
-
-
-# Remove mismatches
-# HARDCODED
-#res <- res[! sample %in% c("EXT_JAP_PT008-103165R", "EXT_JAP_PT875-103207R", "EXT_JAP_PT1146-103229R")]
 
 # Add gene info
 # setnames(res, "hgncid", "gene_name")

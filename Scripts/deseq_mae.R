@@ -14,7 +14,6 @@ saveRDS(snakemake, 'tmp/res_mae.Rds')
 # snakemake <- readRDS('tmp/res_mae.Rds')
 
 suppressPackageStartupMessages({
-    devtools::load_all("mae/")
     library(dplyr)
     library(data.table)
     library(magrittr)
@@ -23,12 +22,14 @@ suppressPackageStartupMessages({
     library(SummarizedExperiment)
 })
 
+
+source("src/R/runDESeq2ForMAE.R")
+
 mae_raw <- fread(snakemake@input$mae_counts)
 mae_raw[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]
-
 # Function from MAE pkg
 rmae <- run_deseq_all_mae(mae_raw) ## build test for counting REF and ALT in MAE
-print("Done with deseq")
+
 
 v29_dt <- fread(snakemake@input$v29_dt)  # gene_annotation, TODO: fix saving it as tsv!!!
 
@@ -54,5 +55,6 @@ rmae_unique[, c('aux', 'N') := NULL]
 setorderv(rmae_unique, c('chr', 'pos'))
 
 saveRDS(rmae_unique, snakemake@output$mae_res)
+
 
 

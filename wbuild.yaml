@@ -1,0 +1,5 @@
+---
+projectTitle: My wBuild project
+htmlOutputPath: Output/html
+scriptsPath: Scripts
+fileRegex: .*

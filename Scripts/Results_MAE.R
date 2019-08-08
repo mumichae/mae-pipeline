@@ -4,16 +4,18 @@
 #' wb:
 #'  input:
 #'   - mae_res: '`sm expand(parser.getProcResultsDir() + "/mae/samplesNEW/{id}_res.Rds", id = parser.getMaeIDs())`'
-#'  output:
-#'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`' 
-#'  type: script
+#' output: 
+#'   html_document:
+#'    code_folding: show
+#'    code_download: TRUE
 #'---
 
-# #' output: 
-# #'   html_document:
-# #'    code_folding: show
-# #'    code_download: TRUE
+
+# #'  output:
+# #'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`' 
+# #'  type: script
 # #'---
+
 
 print("BUILD RESULTS FOR MAE")
 #+ echo=F
@@ -28,7 +30,6 @@ suppressPackageStartupMessages({
     devtools::load_all("../genetic-diagnosis-tools")
 })
 
-#source("Scripts/_functions/gene_annotation/add_gene_info_cols.R")
 
 ## Read all mae files
 res <- lapply(snakemake@input$mae_res, function(m){

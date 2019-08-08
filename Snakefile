@@ -1,5 +1,4 @@
 ### SNAKEFILE MONOALLELIC EXPRESSION
-
 import os
 from config_parser import ConfigHelper
 
@@ -13,26 +12,23 @@ config = parser.config # needed if you dont provide the wbuild.yaml as configfil
 htmlOutputPath = config["htmlOutputPath"]
 include: os.getcwd() + "/.wBuild/wBuild.snakefile" 
 
+      
+rule all:
+    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds"
+    output: touch("tmp/mae.done")   
+
+# overwriting wbuild rule output
+rule rulegraph:
+    shell: "snakemake --rulegraph | dot -Tsvg -Grankdir=TB > {config[htmlOutputPath]}/dep.svg"
+
 # create folders for mae results for rule allelic counts
 dirs = [parser.getProcDataDir() + "/mae/snps", parser.getProcDataDir() + "/mae/allelic_counts"]
 for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
         print("Created directory for MAE results: ", dir)
-        
-#rule all:
-#    input: rules.Index.output, htmlOutputPath + "/readme.html"
-#    output: touch("Output/all.done")
- 
-rule all:
-    input: parser.getProcResultsDir() + "/mae/MAE_results.Rds"
-    output: touch("Output/all.done")   
+  
     
-# overwriting wbuild rule output
-rule rulegraph:
-    shell: "snakemake --rulegraph | dot -Tsvg -Grankdir=TB > {config[htmlOutputPath]}/dep.svg"
-
-
 rule allelic_counts: 
     input:
         vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, isRNA=False),

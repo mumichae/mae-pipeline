@@ -4,6 +4,8 @@
 #' wb:
 #'  input:
 #'   - mae_res: '`sm expand(parser.getProcResultsDir() + "/mae/samplesNEW/{id}_res.Rds", id = parser.getMaeIDs())`'
+#'  output:
+#'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`' 
 #' output: 
 #'   html_document:
 #'    code_folding: show
@@ -11,8 +13,7 @@
 #'---
 
 
-# #'  output:
-# #'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`' 
+
 # #'  type: script
 # #'---
 

@@ -39,7 +39,7 @@ res <- lapply(snakemake@input$mae_res, function(m){
 }) %>% rbindlist()
 
 res <- separate(res, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
-res[, c('GT', 'as_gt') := NULL] ## Do we need this?
+res[, c('GT', 'as_gt') := NULL] 
 
 # Add gene info
 # setnames(res, "hgncid", "gene_name")

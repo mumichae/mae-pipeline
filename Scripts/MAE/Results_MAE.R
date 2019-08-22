@@ -8,11 +8,11 @@
 #'   - res_signif_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`' 
 #' output: 
 #'   html_document:
-#'    code_folding: show
+#'    code_folding: hide
 #'    code_download: TRUE
 #'---
 
-####
+
 #+ echo=F
 saveRDS(snakemake, 'tmp/mae_res_all.Rds')
 # snakemake <- readRDS('tmp/mae_res_all.Rds')
@@ -24,8 +24,7 @@ suppressPackageStartupMessages({
   library(tidyr)
   devtools::load_all("../genetic-diagnosis-tools")
 })
-
-
+   
 #' ### Read all mae files
 res <- lapply(snakemake@input$mae_res, function(m){
   rt <- readRDS(m)

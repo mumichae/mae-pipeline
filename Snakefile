@@ -14,7 +14,7 @@ include: os.getcwd() + "/.wBuild/wBuild.snakefile"
 
       
 rule all:
-    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds"
+    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/readme.html"
     output: touch("tmp/mae.done")   
 
 # overwriting wbuild rule output

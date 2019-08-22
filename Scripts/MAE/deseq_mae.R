@@ -26,9 +26,10 @@ suppressPackageStartupMessages({
 
 source("src/R/runDESeq2ForMAE.R")
 
-mae_raw <- fread(snakemake@input$mae_counts)
+mae_raw <- fread(snakemake@input$mae_counts, fill=TRUE)
 mae_raw[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]
 # Function from MAE pkg
+#print(names(mae_raw))
 rmae <- run_deseq_all_mae(mae_raw) ## build test for counting REF and ALT in MAE
 
 
@@ -55,6 +56,7 @@ rmae_unique[, c('aux', 'N') := NULL]
 
 setorderv(rmae_unique, c('chr', 'pos'))
 
+print("Done with deseq")
 saveRDS(rmae_unique, snakemake@output$mae_res)
 
 

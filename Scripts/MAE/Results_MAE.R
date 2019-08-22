@@ -12,40 +12,38 @@
 #'    code_download: TRUE
 #'---
 
-
-
-# #'  type: script
-# #'---
-
-
-print("BUILD RESULTS FOR MAE")
+####
 #+ echo=F
 saveRDS(snakemake, 'tmp/mae_res_all.Rds')
 # snakemake <- readRDS('tmp/mae_res_all.Rds')
 suppressPackageStartupMessages({
-    library(data.table)
-    library(magrittr)
-    library(ggplot2)
-    library(cowplot)
-    library(tidyr)
-    devtools::load_all("../genetic-diagnosis-tools")
+  library(data.table)
+  library(magrittr)
+  library(ggplot2)
+  library(cowplot)
+  library(tidyr)
+  devtools::load_all("../genetic-diagnosis-tools")
 })
 
 
-## Read all mae files
+#' ### Read all mae files
 res <- lapply(snakemake@input$mae_res, function(m){
-    rt <- readRDS(m)
-    return(rt)
+  rt <- readRDS(m)
+  return(rt)
 }) %>% rbindlist()
 
 res <- separate(res, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
-res[, c('GT', 'as_gt') := NULL] ## Do we need this?
+res[, c('GT', 'as_gt') := NULL] 
 
-# Add gene info
-# setnames(res, "hgncid", "gene_name")
+#' ### Add gene info
 res <- add_all_gene_info(res, dis_genes = F)
 
-# Bring gene_name column front
+#' ### Bring gene_name column front
 res <- cbind(res[, .(gene_name)], res[, -"gene_name"])
 
+#' ### OUTPUT 
+res
+
+#' ### Save result
 saveRDS(res, snakemake@output$res_signif_all)
+

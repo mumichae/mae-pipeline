@@ -25,6 +25,7 @@ suppressPackageStartupMessages({
   devtools::load_all("../genetic-diagnosis-tools")
 })
    
+
 #' ### Read all mae files
 res <- lapply(snakemake@input$mae_res, function(m){
   rt <- readRDS(m)

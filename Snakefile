@@ -6,20 +6,20 @@ from config_parser import ConfigHelper
 if not os.path.exists('tmp'):
     os.makedirs('tmp')
 
-print("In MAE", config)
+#print("In MAE", config)
 parser = ConfigHelper(config)
 config = parser.config # needed if you dont provide the wbuild.yaml as configfile
 htmlOutputPath = config["htmlOutputPath"]
 include: os.getcwd() + "/.wBuild/wBuild.snakefile" 
 
-      
+
 rule all:
-    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/readme.html"
+    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html"
     output: touch("tmp/mae.done")   
 
 # overwriting wbuild rule output
 rule rulegraph:
-    shell: "snakemake --rulegraph | dot -Tsvg -Grankdir=TB > {config[htmlOutputPath]}/dep.svg"
+    shell: "snakemake --rulegraph | dot -Tsvg -Grankdir=TB > dep.svg"
 
 # create folders for mae results for rule allelic counts
 dirs = [parser.getProcDataDir() + "/mae/snps", parser.getProcDataDir() + "/mae/allelic_counts"]
@@ -43,8 +43,33 @@ rule allelic_counts:
         "bcftools index -t {params.snps_filename}; "
         "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam} -V {params.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
 
-rule test:
-    input: parser.getProcDataDir() + "/mae/test/33254--33254R_GAL.csv.gz" #/s/project/prokisch/processed_data/mae/allelic_counts/33254--33254R_GAL.csv.gz
 
+
+### RULEGRAPH  
+### rulegraph only works without print statements. Call <snakemake produce_rulegraph> for producing output
+
+## For rule rulegraph.. copy configfile in tmp file
+import oyaml
+with open('tmp/config.yaml', 'w') as yaml_file:
+    oyaml.dump(config, yaml_file, default_flow_style=False)
+
+rulegraph_filename = htmlOutputPath + "/" + os.path.basename(os.getcwd()) + "_rulegraph"
+rule produce_rulegraph:
+    input:
+        expand(rulegraph_filename + ".{fmt}", fmt=["svg", "png"])
+
+rule create_graph:
+    output:
+        rulegraph_filename + ".dot"
+    shell:
+        "snakemake --configfile tmp/config.yaml --rulegraph > {output}"
+
+rule render_dot:
+    input:
+        "{prefix}.dot"
+    output:
+        "{prefix}.{fmt,(png|svg)}"
+    shell:
+        "dot -T{wildcards.fmt} < {input} > {output}"
 
 

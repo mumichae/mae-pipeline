@@ -22,7 +22,6 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
   library(tidyr)
-  devtools::load_all("../genetic-diagnosis-tools")
 })
    
 
@@ -34,9 +33,6 @@ res <- lapply(snakemake@input$mae_res, function(m){
 
 res <- separate(res, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
 res[, c('GT', 'as_gt') := NULL] 
-
-#' ### Add gene info
-res <- add_all_gene_info(res, dis_genes = F)
 
 #' ### Bring gene_name column front
 res <- cbind(res[, .(gene_name)], res[, -"gene_name"])

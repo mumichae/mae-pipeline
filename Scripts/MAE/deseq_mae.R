@@ -11,8 +11,8 @@
 #'---
 
 print("Started with deseq")
-saveRDS(snakemake, 'tmp/res_mae.Rds')
-# snakemake <- readRDS('tmp/res_mae.Rds')
+saveRDS(snakemake, paste0(snakemake@config$tmpdir,'/MAE/res_mae.Rds'))
+# snakemake <- readRDS('paste0(snakemake@config$tmpdir,'MAE//res_mae.Rds'))
 
 suppressPackageStartupMessages({
     library(dplyr)

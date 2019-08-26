@@ -3,8 +3,10 @@ import os
 from config_parser import ConfigHelper
 
 ## ADD tmp/ DIR
-if not os.path.exists('tmp'):
-    os.makedirs('tmp')
+tmpdir = config["ROOT"] +'/tmp'
+config["tmpdir"] = tmpdir
+if not os.path.exists(tmpdir):
+    os.makedirs(tmpdir)
 
 #print("In MAE", config)
 parser = ConfigHelper(config)
@@ -15,7 +17,7 @@ include: os.getcwd() + "/.wBuild/wBuild.snakefile"
 
 rule all:
     input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html"
-    output: touch("tmp/mae.done")   
+    output: touch(tmpdir + "/mae.done")   
 
 # overwriting wbuild rule output
 rule rulegraph:
@@ -50,7 +52,7 @@ rule allelic_counts:
 
 ## For rule rulegraph.. copy configfile in tmp file
 import oyaml
-with open('tmp/config.yaml', 'w') as yaml_file:
+with open(tmpdir + '/config.yaml', 'w') as yaml_file:
     oyaml.dump(config, yaml_file, default_flow_style=False)
 
 rulegraph_filename = htmlOutputPath + "/" + os.path.basename(os.getcwd()) + "_rulegraph"
@@ -62,7 +64,7 @@ rule create_graph:
     output:
         rulegraph_filename + ".dot"
     shell:
-        "snakemake --configfile tmp/config.yaml --rulegraph > {output}"
+        "snakemake --configfile" + tmpdir + "/config.yaml --rulegraph > {output}"
 
 rule render_dot:
     input:

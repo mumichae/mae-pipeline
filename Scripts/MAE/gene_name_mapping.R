@@ -9,8 +9,8 @@
 #'  type: script
 #'---
 
-saveRDS(snakemake,  paste0(snakemake@config$tmpdir, "/MAE/tmp/gene_map.snakemake"))
-# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/tmp/gene_map.snakemake"))
+saveRDS(snakemake,  paste0(snakemake@config$tmpdir, "/MAE/gene_map.snakemake"))
+# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/gene_map.snakemake"))
 
 suppressPackageStartupMessages({
   library(rtracklayer)

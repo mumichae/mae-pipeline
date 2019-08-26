@@ -14,8 +14,9 @@
 #'---
 
 #+ echo=F
-saveRDS(snakemake, 'tmp/mae_res_all.Rds')
-# snakemake <- readRDS('tmp/mae_res_all.Rds')
+saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/mae_res_all.Rds") )
+# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/mae_res_all.Rds"))
+
 suppressPackageStartupMessages({
   library(data.table)
   library(ggplot2)

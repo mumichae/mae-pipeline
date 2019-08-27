@@ -33,8 +33,7 @@ for dir in dirs:
 
 rule create_snps:
     input:
-        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, isRNA=False),
-        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, isRNA=True)
+        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, isRNA=False)
     output:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
     shell:
@@ -45,6 +44,7 @@ rule create_snps:
 rule allelic_counts: 
     input:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
+        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, isRNA=True)
     params:
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))
     output:    

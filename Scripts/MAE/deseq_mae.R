@@ -6,7 +6,7 @@
 #'   - mae_counts: '`sm parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz" `'
 #'   - v29_dt: '`sm parser.getProcDataDir() + "/mae/v29/gene_name_mapping.Rds" `'
 #'  output:
-#'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/samplesNEW/{vcf}--{rna}_res.Rds"`'
+#'   - mae_res: '`sm parser.getProcResultsDir() + "/mae/samples/{vcf}--{rna}_res.Rds"`'
 #'  type: script
 #'---
 

@@ -21,10 +21,11 @@ suppressPackageStartupMessages({
     library(tidyr)
     library(GenomicRanges)
     library(SummarizedExperiment)
+    ## LOAD tMAE package
+    devtools::load_all("tMAE")
 })
 
 
-source("src/R/runDESeq2ForMAE.R")
 
 mae_raw <- fread(snakemake@input$mae_counts, fill=TRUE)
 mae_raw[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]

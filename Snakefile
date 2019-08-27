@@ -30,20 +30,28 @@ for dir in dirs:
         os.makedirs(dir)
         print("Created directory for MAE results: ", dir)
   
-    
-rule allelic_counts: 
+
+rule create_snps:
     input:
         vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, isRNA=False),
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, isRNA=True)
-    params:
+    output:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
+    shell:
+        "bcftools annotate --force -x INFO {input.vcf_file} | bcftools view -s {wildcards.vcf} -m2 -M2 -v snps -O z -o {output.snps_filename}; "
+        "bcftools index -t {output.snps_filename}; "
+
+
+rule allelic_counts: 
+    input:
+        snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
+    params:
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:
-        "bcftools annotate --force -x INFO {input.vcf_file} | bcftools view -s {wildcards.vcf} -m2 -M2 -v snps -O z -o {params.snps_filename}; "
-        "bcftools index -t {params.snps_filename}; "
-        "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam} -V {params.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
+        "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam} -V {input.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
+
 
 
 

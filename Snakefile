@@ -5,8 +5,8 @@ from config_parser import ConfigHelper
 ## ADD tmp/ DIR
 tmpdir = config["ROOT"] + '/' + config["DATASET_NAME"] + '/tmp'
 config["tmpdir"] = tmpdir
-if not os.path.exists(tmpdir):
-    os.makedirs(tmpdir)
+if not os.path.exists(tmpdir+'/MAE'):
+    os.makedirs(tmpdir+'/MAE')
 
 #print("In MAE", config)
 parser = ConfigHelper(config)

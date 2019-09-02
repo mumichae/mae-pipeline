@@ -14,7 +14,6 @@ htmlOutputPath = config["htmlOutputPath"]
 include: os.getcwd() + "/.wBuild/wBuild.snakefile" 
 
 # print( parser.getVCFsFilePaths(assay="wes_assay"))
-print(parser.createGroupIds(group_key="subset_key", assay_key="rna_assay", sep=",")["fib"])
 
 rule all:
     input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html" #, parser.getProcResultsDir() + "/mae/qc_matrix.Rds"

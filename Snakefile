@@ -8,15 +8,15 @@ config["tmpdir"] = tmpdir
 if not os.path.exists(tmpdir+'/MAE'):
     os.makedirs(tmpdir+'/MAE')
 
-#print("In MAE", config)
 parser = ConfigHelper(config)
 config = parser.config # needed if you dont provide the wbuild.yaml as configfile
 htmlOutputPath = config["htmlOutputPath"]
 include: os.getcwd() + "/.wBuild/wBuild.snakefile" 
 
+# print( parser.getVCFsFilePaths(assay="wes_assay"))
 
 rule all:
-    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html"
+    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html" #, parser.getProcResultsDir() + "/mae/qc_matrix.Rds"
     output: touch(tmpdir + "/mae.done")   
 
 # overwriting wbuild rule output
@@ -52,7 +52,16 @@ rule allelic_counts:
     shell:
         "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam} -V {input.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
 
-
+rule allelic_counts_qc: 
+    input:
+        snps_filename="/s/project/genetic_diagnosis/resource/qc_ucsc.vcf.gz",
+        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, isRNA=True)
+    params:
+        chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))
+    output:    
+        counted=parser.getProcDataDir() + "/mae/allelic_counts_qc/{rna}.csv.gz"
+    shell:
+        "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam} -V {input.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
 
 
 ### RULEGRAPH  

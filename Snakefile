@@ -8,15 +8,16 @@ config["tmpdir"] = tmpdir
 if not os.path.exists(tmpdir+'/MAE'):
     os.makedirs(tmpdir+'/MAE')
 
-#print("In MAE", config)
 parser = ConfigHelper(config)
 config = parser.config # needed if you dont provide the wbuild.yaml as configfile
 htmlOutputPath = config["htmlOutputPath"]
 include: os.getcwd() + "/.wBuild/wBuild.snakefile" 
-print(parser.getFilePath('33254', isRNA=False))
+
+# print( parser.getVCFsFilePaths(assay="wes_assay"))
+print(parser.createGroupIds(group_key="subset_key", assay_key="rna_assay", sep=",")["fib"])
 
 rule all:
-    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html"
+    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html" #, parser.getProcResultsDir() + "/mae/qc_matrix.Rds"
     output: touch(tmpdir + "/mae.done")   
 
 # overwriting wbuild rule output

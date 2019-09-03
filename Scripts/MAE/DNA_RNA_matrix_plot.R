@@ -16,6 +16,7 @@ saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/qc_hist.snakemake"))
 
 suppressPackageStartupMessages({
   library(dplyr)
+  library(data.table)
 })
 
 

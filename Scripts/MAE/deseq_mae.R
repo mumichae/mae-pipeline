@@ -12,7 +12,7 @@
 
 print("Started with deseq")
 saveRDS(snakemake, paste0(snakemake@config$tmpdir,'/MAE/deseq_mae.snakemake'))
-# snakemake <- readRDS('paste0(snakemake@config$tmpdir,'MAE/deseq_mae.snakemake'))
+# snakemake <- readRDS(paste0(snakemake@config$tmpdir, '/MAE/deseq_mae.snakemake'))
 
 suppressPackageStartupMessages({
     library(dplyr)
@@ -28,11 +28,11 @@ suppressPackageStartupMessages({
 
 
 mae_raw <- fread(snakemake@input$mae_counts, fill=TRUE)
-mae_raw[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]
+# mae_raw[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]
 # Function from MAE pkg
 #print(names(mae_raw))
 rmae <- run_deseq_all_mae(mae_raw) ## build test for counting REF and ALT in MAE
-
+rmae[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]
 
 v29_dt <- fread(snakemake@input$v29_dt)  # gene_annotation, TODO: fix saving it as tsv!!!
 
@@ -59,6 +59,4 @@ setorderv(rmae_unique, c('chr', 'pos'))
 
 print("Done with deseq")
 saveRDS(rmae_unique, snakemake@output$mae_res)
-
-
 

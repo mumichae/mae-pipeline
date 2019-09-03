@@ -29,6 +29,10 @@ for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
         print("Created directory for MAE results: ", dir)
+
+##
+config["rna_ids_qc"] = parser.createGroupIds(group_key="subset_key", assay_key="rna_assay", sep=",")["fib"] 
+config["wes_ids_qc"] = parser.getSampleIDs(experiment=config["wes_assay"])
   
 
 rule create_snps:

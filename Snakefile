@@ -30,11 +30,6 @@ for dir in dirs:
         os.makedirs(dir)
         print("Created directory for MAE results: ", dir)
 
-##
-config["rna_ids_qc"] = parser.createGroupIds(group_key="subset_key", assay_key="rna_assay", sep=",")[config[mae_qc_group]]
-config["wes_ids_qc"] = parser.getSampleIDs(experiment=config["wes_assay"])
-  
-
 rule create_snps:
     input:
         vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, isRNA=False)

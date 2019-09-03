@@ -29,4 +29,6 @@ match_dt <- data.table(EXOME_ID = row.names(mat)[match_mat[,1]],
                        RNA_ID_MATCHED = colnames(mat)[match_mat[,2]],
                        ID_value = mat[match_mat])
 
+setorder(match_dt, -ID_value)
+
 DT::datatable(match_dt, filter = 'top')

@@ -3,14 +3,12 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_res: '`sm expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = parser.getMaeIDs())`'
+#'   - mae_res: '`sm lambda wildcards: expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = parser.getMaeByGroup({wildcards.dataset}))`'
 #'  output:
-#'   - res_all: '`sm parser.getProcResultsDir() + "/mae/MAE_results_all.Rds"`' 
-#'   - res_signif: '`sm parser.getProcResultsDir() + "/mae/MAE_results.Rds"`' 
-#' output: 
-#'   html_document:
-#'    code_folding: hide
-#'    code_download: TRUE
+#'   - res_all: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all.Rds"`' 
+#'   - res_signif: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results.Rds"`'
+#'   - wBhtml: '`sm config["htmlOutputPath"] + "/mae/{dataset}_results.html"`'
+#'  type: noindex
 #'---
 
 #+ echo=F

@@ -4,13 +4,13 @@
 #' wb:
 #'  py:
 #'  - |
-#'   config["rna_ids_qc"] = parser.createGroupIds(group_key="subset_key", assay_key="rna_assay", sep=",")["fib"] 
+#'   config["rna_ids_qc"] = parser.all_rna_ids
 #'   config["wes_ids_qc"] = parser.getSampleIDs(experiment=config["wes_assay"])
 #'  input: 
-#'    - mae_res: '`sm expand(parser.getProcDataDir() + "/mae/RNA_GT/{rna}.Rds", rna=parser.createGroupIds(group_key="subset_key", assay_key="rna_assay", sep=",")["fib"])`'
+#'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() + "/mae/RNA_GT/{rna}.Rds", rna=parser.getRNAByGroup({wildcards.dataset}))`'
 #'    - vcf: '`sm parser.getVCFsFilePaths(assay="wes_assay")`'
 #'  output:
-#'    - mat_qc: '`sm parser.getProcResultsDir() + "/mae/dna_rna_qc_matrix.Rds" `'
+#'    - mat_qc: '`sm parser.getProcResultsDir() + "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
 #'  threads: 50
 #'  type: script
 #'---
@@ -37,7 +37,7 @@ input_vcf <- snakemake@input$vcf
 wes_samples <- snakemake@config$wes_ids_qc
 
 
-rna_samples <- snakemake@config$rna_ids_qc
+rna_samples <- snakemake@config$rna_ids_qc[snakemake@wildcards$dataset]
 mae_res <- snakemake@input$mae_res
 
 N <- length(input_vcf)

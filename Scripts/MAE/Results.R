@@ -30,7 +30,7 @@ rmae <- lapply(snakemake@input$mae_res, function(m){
 
 # Clean res
 rmae <- separate(rmae, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
-rmae[, c('GT', 'as_gt') := NULL] 
+rmae[, c('GT', 'RNA_GT') := NULL] 
 
 # Add gene names
 gene_annot_dt <- fread(snakemake@input$gene_name_mapping)

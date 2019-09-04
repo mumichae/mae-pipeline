@@ -20,6 +20,9 @@ suppressPackageStartupMessages({
   library(data.table)
   library(ggplot2)
   library(tidyr)
+  library(GenomicRanges)
+  library(SummarizedExperiment)
+  library(dplyr)
 })
    
 # Read all MAE results files

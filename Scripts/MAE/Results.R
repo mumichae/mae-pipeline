@@ -52,12 +52,14 @@ res_annot <- cbind(rmae[from(fo), ],  gene_annot_dt[to(fo), .(gene_name, gene_ty
 # Prioritze protein coding genes
 res_annot <- rbind(res_annot[gene_type == 'protein_coding'], res_annot[gene_type != 'protein_coding'])
 
-# Write all the other genes in another column 
+# Write all the other genes in another column
 res_annot[, aux := paste(chr, pos, sep = "-")]
-res_annot[, N := 1:.N, by = aux]
-r_other <- res_annot[N > 1, .(other_names = paste(gene_name, collapse = ',')), by = aux]
-res <- left_join(res_annot[N == 1], r_other, by = 'aux') %>% as.data.table()
-res[, c('aux', 'N') := NULL]
+rvar <- unique(res_annot[, .(aux, gene_name)])
+rvar[, N := 1:.N, by = aux]
+
+r_other <- rvar[N > 1, .(other_names = paste(gene_name, collapse = ',')), by = aux]
+res <- left_join(res_annot, r_other, by = 'aux') %>% as.data.table()
+res[, c('aux') := NULL]
 
 # Bring gene_name column front
 res <- cbind(res[, .(gene_name)], res[, -"gene_name"])
@@ -70,7 +72,7 @@ uniqueN(res$sample)
 uniqueN(res$gene_name)
 
 #' ### Subset for significant events (pad < .05 & frequency of alternative > .8)
-res[, MAE := padj < .2]
+res[, MAE := padj < .05]
 res[, MAE_ALT := MAE == TRUE & alt_freq > .8]
 
 #' Number of samples with significant MA for alternative events
@@ -101,3 +103,7 @@ ggplot(melt_dt, aes(variable, value)) + geom_boxplot() +
   scale_y_log10() + theme_bw(base_size = 14) +
   labs(y = 'Heterozygous SNVs per patient', x = '')
 
+
+#' 
+#' ## Results table
+DT::datatable(res[MAE_ALT == TRUE], filter = 'top')

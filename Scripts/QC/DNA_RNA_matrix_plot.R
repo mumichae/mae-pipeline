@@ -21,14 +21,14 @@ suppressPackageStartupMessages({
 mtxs <- lapply(snakemake@input$mat_qc, readRDS)
 
 plot_qc_matrix <- function(qc_mat) {
-  hist(mat, xlab = '% of overlapping variants from DNA and RNA', main = '')
+  hist(qc_mat, xlab = '% of overlapping variants from DNA and RNA', main = '')
   
   identity_cutoff <- .85
   
-  match_mat <- which(mat > identity_cutoff, arr.ind = TRUE)
-  match_dt <- data.table(EXOME_ID = row.names(mat)[match_mat[,1]], 
-                         RNA_ID_MATCHED = colnames(mat)[match_mat[,2]],
-                         ID_value = mat[match_mat])
+  match_mat <- which(qc_mat > identity_cutoff, arr.ind = TRUE)
+  match_dt <- data.table(EXOME_ID = row.names(qc_mat)[match_mat[,1]], 
+                         RNA_ID_MATCHED = colnames(qc_mat)[match_mat[,2]],
+                         ID_value = qc_mat[match_mat])
   
   setorder(match_dt, -ID_value)
   DT::datatable(match_dt, filter = 'top')

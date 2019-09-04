@@ -1,5 +1,4 @@
 #'---
-#'
 #' title: Full MAE analysis over all datasets
 #' author: Michaela Mueller
 #' wb:
@@ -12,6 +11,7 @@
 #' output:
 #'  html_document
 #'---
+
 
 saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake") )
 # snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake")

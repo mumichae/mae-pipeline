@@ -28,7 +28,7 @@ rmae <- lapply(snakemake@input$mae_res, function(m){
 }) %>% rbindlist()
 
 # Clean res
-rmae <- separate(res_raw, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
+rmae <- separate(rmae, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
 rmae[, c('GT', 'as_gt') := NULL] 
 
 # Add gene names

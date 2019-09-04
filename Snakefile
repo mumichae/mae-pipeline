@@ -31,7 +31,7 @@ for dir in dirs:
         print("Created directory for MAE results: ", dir)
   
 
-rule create_snps:
+rule create_SNVs:
     input:
         vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, isRNA=False)
     output:

@@ -10,3 +10,12 @@
 #'  html_document
 #'---
 
+saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake") )
+# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake")
+
+# groups <- names(snakemake@config$outrider_filtered)
+# gene_annotation_names <- names(snakemake@config$GENE_ANNOTATION)
+# summaries_titles <- paste(gene_annotation_names, groups)
+# summaries <- paste('[', summaries_titles ,'](', gsub(snakemake@config$htmlOutputPath, ".", snakemake@input$summaries), ')', sep = '')
+# summaries <- paste(summaries, sep = '\n')
+# #' Summaries:  `r summaries`

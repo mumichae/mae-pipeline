@@ -21,20 +21,44 @@ suppressPackageStartupMessages({
   library(tidyr)
 })
    
-#'
-#' ### Read all mae files
-
-res <- lapply(snakemake@input$mae_res, function(m){
+# Read all MAE results files
+rmae <- lapply(snakemake@input$mae_res, function(m){
   rt <- readRDS(m)
   return(rt)
 }) %>% rbindlist()
 
-res <- separate(res, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
-res[, c('GT', 'as_gt') := NULL] 
+# Clean res
+rmae <- separate(res_raw, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", remove = FALSE)
+rmae[, c('GT', 'as_gt') := NULL] 
+
+# Add gene names
+gene_annot_dt <- fread(snakemake@input$v29_dt)
+
+# Subtract the genomic ranges from the annotation and results and overlap them
+gene_annot_ranges <- GRanges(seqnames = gene_annot_dt$seqnames, 
+                             IRanges(start = gene_annot_dt$start, end = gene_annot_dt$end), 
+                             strand = gene_annot_dt$strand)
+rmae_ranges <- GRanges(seqnames = rmae$chr, IRanges(start = rmae$pos, end = rmae$pos), strand = '*')
+
+fo <- findOverlaps(rmae_ranges, v29_ranges)
+
+# Add the gene names
+res_annot <- cbind(rmae[from(fo), ],  gene_annot_dt[to(fo), .(gene_name, gene_type)])
+
+# Prioritze protein coding genes
+res_annot <- rbind(res_annot[gene_type == 'protein_coding'], res_annot[gene_type != 'protein_coding'])
+
+# Write all the other genes in another column 
+res_annot[, aux := paste(chr, pos, sep = "-")]
+res_annot[, N := 1:.N, by = aux]
+r_other <- res_annot[N > 1, .(other_names = paste(gene_name, collapse = ',')), by = aux]
+res <- left_join(res_annot[N == 1], r_other, by = 'aux') %>% as.data.table()
+res[, c('aux', 'N') := NULL]
 
 # Bring gene_name column front
 res <- cbind(res[, .(gene_name)], res[, -"gene_name"])
 
+#'
 #' Total number of samples
 uniqueN(res$sample)
 

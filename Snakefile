@@ -53,7 +53,7 @@ rule allelic_counts:
 
 rule allelic_counts_qc: 
     input:
-        snps_filename="/s/project/genetic_diagnosis/resource/qc_ucsc.vcf.gz",
+        snps_filename=config["qc_vcf"],
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, isRNA=True)
     params:
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))

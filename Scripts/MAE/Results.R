@@ -4,10 +4,11 @@
 #' wb:
 #'  input:
 #'   - mae_res: '`sm lambda wildcards: expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = parser.getMaeByGroup({wildcards.dataset}))`'
+#'   - gene_name_mapping: '`sm parser.getProcDataDir() + "/mae/gene_name_mapping_{annotation}.Rds"`'
 #'  output:
-#'   - res_all: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all.Rds"`' 
-#'   - res_signif: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results.Rds"`'
-#'   - wBhtml: '`sm config["htmlOutputPath"] + "/mae/{dataset}_results.html"`'
+#'   - res_all: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.Rds"`' 
+#'   - res_signif: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_{annotation}.Rds"`'
+#'   - wBhtml: '`sm config["htmlOutputPath"] + "/mae/{dataset}--{annotation}_results.html"`'
 #'  type: noindex
 #'---
 
@@ -32,7 +33,7 @@ rmae <- separate(res_raw, 'sample', into = c('EXOME_ID', 'RNA_ID'), sep = "--", 
 rmae[, c('GT', 'as_gt') := NULL] 
 
 # Add gene names
-gene_annot_dt <- fread(snakemake@input$v29_dt)
+gene_annot_dt <- fread(snakemake@input$gene_name_mapping)
 
 # Subtract the genomic ranges from the annotation and results and overlap them
 gene_annot_ranges <- GRanges(seqnames = gene_annot_dt$seqnames, 
@@ -40,7 +41,7 @@ gene_annot_ranges <- GRanges(seqnames = gene_annot_dt$seqnames,
                              strand = gene_annot_dt$strand)
 rmae_ranges <- GRanges(seqnames = rmae$chr, IRanges(start = rmae$pos, end = rmae$pos), strand = '*')
 
-fo <- findOverlaps(rmae_ranges, v29_ranges)
+fo <- findOverlaps(rmae_ranges, gene_annot_ranges)
 
 # Add the gene names
 res_annot <- cbind(rmae[from(fo), ],  gene_annot_dt[to(fo), .(gene_name, gene_type)])

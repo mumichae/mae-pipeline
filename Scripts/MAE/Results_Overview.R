@@ -3,9 +3,12 @@
 #' title: Full MAE analysis over all datasets
 #' author: Michaela Mueller
 #' wb:
+#'  py:
+#'   - |
+#'    annotations = list(config["GENE_ANNOTATION"].keys())
+#'    datasets = config["mae_groups"]
 #'  input:
-#'   - res_all: '`sm expand(parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all.Rds", dataset=config["mae_groups"])`' 
-#'   - res_signif: '`sm expand(parser.getProcResultsDir() + "/mae/{dataset}/MAE_results.Rds", dataset=config["mae_groups"])`'
+#'   - html: '`sm expand(config["htmlOutputPath"] + "/mae/{dataset}--{annotation}_results.html", annotation=annotations, dataset=datasets)`'
 #' output:
 #'  html_document
 #'---
@@ -13,9 +16,10 @@
 saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake") )
 # snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake")
 
-# groups <- names(snakemake@config$outrider_filtered)
-# gene_annotation_names <- names(snakemake@config$GENE_ANNOTATION)
-# summaries_titles <- paste(gene_annotation_names, groups)
-# summaries <- paste('[', summaries_titles ,'](', gsub(snakemake@config$htmlOutputPath, ".", snakemake@input$summaries), ')', sep = '')
-# summaries <- paste(summaries, sep = '\n')
-# #' Summaries:  `r summaries`
+groups <- names(snakemake@config$mae_groups)
+gene_annotation_names <- names(snakemake@config$GENE_ANNOTATION)
+
+titles <- paste(gene_annotation_names, groups)
+summaries <- paste('[', titles ,'](', gsub(snakemake@config$htmlOutputPath, ".", snakemake@input$html), ')', sep = '')
+summaries <- paste(summaries, sep = '\n')
+#' Summaries:  `r summaries`

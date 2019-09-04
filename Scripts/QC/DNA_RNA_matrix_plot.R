@@ -18,7 +18,7 @@ suppressPackageStartupMessages({
   library(data.table)
 })
 
-mtxs <- readRDS(snakemake@input$mat_qc)
+qc_mat <- readRDS(snakemake@input$mat_qc)
 
 hist(qc_mat, xlab = '% of overlapping variants from DNA and RNA', main = '')
 

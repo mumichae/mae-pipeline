@@ -1,6 +1,6 @@
 ### SNAKEFILE MONOALLELIC EXPRESSION
 import os
-from config_parser import ConfigHelper
+import drop
 
 ## ADD tmp/ DIR
 tmpdir = config["ROOT"] + '/' + config["DATASET_NAME"] + '/tmp'
@@ -8,20 +8,15 @@ config["tmpdir"] = tmpdir
 if not os.path.exists(tmpdir+'/MAE'):
     os.makedirs(tmpdir+'/MAE')
 
-parser = ConfigHelper(config)
+parser = drop.config(config)
 config = parser.config # needed if you dont provide the wbuild.yaml as configfile
 htmlOutputPath = config["htmlOutputPath"]
 include: os.getcwd() + "/.wBuild/wBuild.snakefile" 
 
-# print( parser.getVCFsFilePaths(assay="wes_assay"))
 
 rule all:
     input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html" #, parser.getProcResultsDir() + "/mae/qc_matrix.Rds"
-    output: touch(tmpdir + "/mae.done")   
-
-# overwriting wbuild rule output
-rule rulegraph:
-    shell: "snakemake --rulegraph | dot -Tsvg -Grankdir=TB > dep.svg"
+    output: touch(tmpdir + "/MAE.done")
 
 # create folders for mae results for rule allelic counts
 dirs = [parser.getProcDataDir() + "/mae/snps", parser.getProcDataDir() + "/mae/allelic_counts"]
@@ -32,7 +27,7 @@ for dir in dirs:
 
 rule create_snps:
     input:
-        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, isRNA=False)
+        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['wes_assay', 'wgs_assay'])
     output:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
     shell:
@@ -43,7 +38,7 @@ rule create_snps:
 rule allelic_counts: 
     input:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
-        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, isRNA=True)
+        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='rna_assay')
     params:
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))
     output:    
@@ -54,7 +49,7 @@ rule allelic_counts:
 rule allelic_counts_qc: 
     input:
         snps_filename=config["qc_vcf"],
-        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, isRNA=True)
+        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='rna_assay')
     params:
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))
     output:    

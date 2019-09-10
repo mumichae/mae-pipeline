@@ -5,10 +5,10 @@
 #'  py:
 #'  - |
 #'   config["rna_ids_qc"] = parser.all_rna_ids
-#'   config["wes_ids_qc"] = parser.getSampleIDs(experiment=config["wes_assay"])
+#'   config["wes_ids_qc"] = parser.getSampleIDs(experiment="wes_assay")
 #'  input: 
 #'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() + "/mae/RNA_GT/{rna}.Rds", rna=parser.getRNAByGroup({wildcards.dataset}))`'
-#'    - vcf: '`sm parser.getVCFsFilePaths(assay="wes_assay")`'
+#'    - vcf: '`sm parser.getFilePaths(assay="wes_assay")`'
 #'  output:
 #'    - mat_qc: '`sm parser.getProcResultsDir() + "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
 #'  threads: 50

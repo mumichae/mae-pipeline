@@ -25,7 +25,7 @@ for dir in dirs:
         os.makedirs(dir)
         print("Created directory for MAE results: ", dir)
 
-rule create_snps:
+rule create_SNVs:
     input:
         vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['wes_assay', 'wgs_assay'])
     output:

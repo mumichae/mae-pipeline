@@ -40,11 +40,12 @@ rule allelic_counts:
         snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
     params:
-        chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))
+        chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"])),
+        script=os.path.dirname(__file__) + "/Scripts/MAE/ASEReadCounter.sh"
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:
-        "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam} -V {input.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
+        "{params.script} {config[gatk]} {config[genome]} {input.bam} {input.snps_filename} {config[gatk_sanity_check]} {wildcards.vcf} {wildcards.rna} {output.counted} {params.chrNames}"
 
 rule allelic_counts_qc: 
     input:

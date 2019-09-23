@@ -30,7 +30,7 @@ rule create_SNVs:
     input:
         vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['WES_ASSAY', 'WGS_ASSAY'])
     output:
-        snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
+        snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}.vcf.gz",
     shell:
         "bcftools annotate --force -x INFO {input.vcf_file} | bcftools view -s {wildcards.vcf} -m2 -M2 -v snps -O z -o {output.snps_filename}; "
         "bcftools index -t {output.snps_filename}; "
@@ -38,7 +38,7 @@ rule create_SNVs:
 
 rule allelic_counts: 
     input:
-        snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}--{rna}.vcf.gz",
+        snps_filename=parser.getProcDataDir() + "/mae/snps/{vcf}.vcf.gz",
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
     params:
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"])),

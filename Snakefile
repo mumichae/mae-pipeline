@@ -1,6 +1,7 @@
 ### SNAKEFILE MONOALLELIC EXPRESSION
 import os
 import drop
+import pathlib
 
 ## ADD tmp/ DIR
 tmpdir = config["ROOT"] + '/' + config["DATASET_NAME"] + '/tmp'
@@ -41,7 +42,7 @@ rule allelic_counts:
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
     params:
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"])),
-        script=os.path.dirname(__file__) + "/Scripts/MAE/ASEReadCounter.sh"
+        script=pathlib.Path(drop.__file__).parent / "modules/mae-pipeline/Scripts/MAE/ASEReadCounter.sh"
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:

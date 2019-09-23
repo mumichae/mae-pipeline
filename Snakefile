@@ -15,7 +15,7 @@ include: os.getcwd() + "/.wBuild/wBuild.snakefile"
 
 
 rule all:
-    input: rules.Index.output, parser.getProcResultsDir() + "/mae/MAE_results.Rds", htmlOutputPath + "/mae_readme.html" #, parser.getProcResultsDir() + "/mae/qc_matrix.Rds"
+    input: rules.Index.output
     output: touch(tmpdir + "/MAE.done")
 
 # create folders for mae results for rule allelic counts

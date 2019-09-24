@@ -1,16 +1,26 @@
 #!/bin/bash
 
-# $1 {config[gatk]}
-# $2 {config[genome]}
-# $3 {input.bam}
-# $4 {input.snps_filename}
-# $5 {config[gatk_sanity_check]}
-# $6 {vcf}
-# $7 {rna}
-# $8 {output.counted}
-# $9 {params.chrNames}
+gatk=$1 # {config[gatk]} # path to gatk
+fasta=$2 # {config[genome]} # genome fasta file
+bam_file=$3 # {input.bam}
+vcf_file=$4 # {input.snps_filename}
+sanity=$5 # {config[gatk_sanity_check]}
+vcf_id=$6 # {vcf_id}
+rna_id=$7 # {rna_id}
+output=$8 # {output.counted}
 
-separator="--"
-chrs=${@:9}
+# get chr format of BAM
+bam_chr=$(samtools idxstats ${bam_file} | grep chr | wc -l)
+# compare chr format and rename vcf if necessary
+if [ ${bam_chr} -eq 0 ]
+then 
+    chr_mod="$(dirname $0)/chr_NCBI_UCSC.txt"
+else
+    chr_mod="$(dirname $0)/chr_UCSC_NCBI.txt"
+fi
 
-$1 ASEReadCounter -R $2 -I $3 -V $4 $chrs --disable-sequence-dictionary-validation $5 | awk -v vcfrna="$6$separator$7" -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "mae_id"} NR>1{print $0, vcfrna}' | gzip > $8
+chrs=$(cut -f1 $chr_mod)
+echo $chrs
+
+#$gatk ASEReadCounter -R $fasta -I ${bam_file} -V ${vcf_file} $chrs --disable-sequence-dictionary-validation ${sanity} | \
+#awk -v vcfrna="${vcf_id}--${rna_id}" -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "mae_id"} NR>1{print $0, vcfrna}' | gzip > ${output}

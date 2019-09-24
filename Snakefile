@@ -16,7 +16,9 @@ include: os.getcwd() + "/.wBuild/wBuild.snakefile"
 
 
 rule all:
-    input: rules.Index.output
+    input: 
+        rules.Index.output, 
+        parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.Rds"
     output: touch(tmpdir + "/MAE.done")
 
 # create folders for mae results for rule allelic counts
@@ -26,27 +28,40 @@ for dir in dirs:
         os.makedirs(dir)
         print("Created directory for MAE results: ", dir)
 
+rule MAE:
+    input:
+        expand(parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.Rds", 
+            dataset=parser.mae_ids,
+            annotation=list(config["GENE_ANNOTATION"].keys())
+        ),
+        rules.Scripts_MAE_Results_Overview_R.output
+
+rule QC:
+    input: 
+        parser.getProcResultsDir() + "/mae/" + config["qc_group"] + "/dna_rna_qc_matrix.Rds",
+        rules.Scripts_QC_DNA_RNA_matrix_plot_R.output
+
 rule create_SNVs:
     input:
-        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['WES_ASSAY', 'WGS_ASSAY'])
+        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['WES_ASSAY', 'WGS_ASSAY']),
+        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
+    params:
+        script=pathlib.Path(drop.__file__).parent / "modules/mae-pipeline/Scripts/MAE/filterSNVs.sh"
     output:
-        snps_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}.vcf.gz",
+        snvs_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz"
     shell:
-        "bcftools annotate --force -x INFO {input.vcf_file} | bcftools view -s {wildcards.vcf} -m2 -M2 -v snps -O z -o {output.snps_filename}; "
-        "bcftools index -t {output.snps_filename}; "
-
+        "{params.script} {input.vcf_file} {wildcards.vcf} {input.bam} {output.snvs_filename}"
 
 rule allelic_counts: 
     input:
         snps_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}.vcf.gz",
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
     params:
-        chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"])),
         script=pathlib.Path(drop.__file__).parent / "modules/mae-pipeline/Scripts/MAE/ASEReadCounter.sh"
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:
-        "{params.script} {config[gatk]} {config[genome]} {input.bam} {input.snps_filename} {config[gatk_sanity_check]} {wildcards.vcf} {wildcards.rna} {output.counted} {params.chrNames}"
+        "{params.script} {config[gatk]} {config[genome]} {input.bam} {input.snps_filename} {config[gatk_sanity_check]} {wildcards.vcf} {wildcards.rna} {output.counted}"
 
 rule allelic_counts_qc: 
     input:

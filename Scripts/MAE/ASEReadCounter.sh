@@ -23,4 +23,4 @@ chrs=$(cut -f1 $chr_mod)
 echo $chrs
 
 #$gatk ASEReadCounter -R $fasta -I ${bam_file} -V ${vcf_file} $chrs --disable-sequence-dictionary-validation ${sanity} | \
-#awk -v vcfrna="${vcf_id}--${rna_id}" -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "mae_id"} NR>1{print $0, vcfrna}' | gzip > ${output}
+#awk -v vcfrna="${vcf_id}--${rna_id}" -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "MAE_ID"} NR>1{print $0, vcfrna}' | gzip > ${output}

@@ -9,18 +9,24 @@ vcf_id=$6 # {vcf_id}
 rna_id=$7 # {rna_id}
 output=$8 # {output.counted}
 
-# get chr format of BAM
-bam_chr=$(samtools idxstats ${bam_file} | grep chr | wc -l)
-# compare chr format and rename vcf if necessary
-if [ ${bam_chr} -eq 0 ]
-then 
-    chr_mod="$(dirname $0)/chr_NCBI_UCSC.txt"
+# get chr format
+vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | sort | uniq)
+
+if [ $(echo ${vcf_chr} | grep 'chr' | wc -l) -eq 0 ]
+then
+    echo "use NCBI format"
+    canonical="$(dirname $0)/chr_NCBI_UCSC.txt"
 else
-    chr_mod="$(dirname $0)/chr_UCSC_NCBI.txt"
+    echo "use UCSC format"
+    canonical="$(dirname $0)/chr_UCSC_NCBI.txt"
 fi
 
-chrs=$(cut -f1 $chr_mod)
-echo $chrs
+# subset from canonical chromosomes
+chr_subset=$(comm -1  <(cut -f1 -d" " ${canonical} | sort) <(echo ${vcf_chr}))
+chr_subset=$(echo $chr_subset | grep -v '^$' | sed -e 's/^/-L /' | tr '\n' ' ')
 
-#$gatk ASEReadCounter -R $fasta -I ${bam_file} -V ${vcf_file} $chrs --disable-sequence-dictionary-validation ${sanity} | \
-#awk -v vcfrna="${vcf_id}--${rna_id}" -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "mae_id"} NR>1{print $0, vcfrna}' | gzip > ${output}
+$gatk ASEReadCounter -R $fasta -I ${bam_file} -V ${vcf_file} ${chr_subset} \
+    --disable-sequence-dictionary-validation ${sanity} \
+    | awk -v vcfrna="${vcf_id}--${rna_id}" \
+    -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "mae_id"} NR>1{print $0, vcfrna}' \
+    | gzip > ${output}

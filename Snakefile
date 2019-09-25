@@ -18,11 +18,14 @@ include: os.getcwd() + "/.wBuild/wBuild.snakefile"
 rule all:
     input: 
         rules.Index.output, 
-        parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.Rds"
+        expand(parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.Rds", 
+            dataset=parser.mae_ids.keys(),
+            annotation=list(config["GENE_ANNOTATION"].keys())
+        )
     output: touch(tmpdir + "/MAE.done")
 
 # create folders for mae results for rule allelic counts
-dirs = [parser.getProcDataDir() + "/mae/snps", parser.getProcDataDir() + "/mae/allelic_counts"]
+dirs = [parser.getProcDataDir() + "/mae/snvs", parser.getProcDataDir() + "/mae/allelic_counts"]
 for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
@@ -31,7 +34,7 @@ for dir in dirs:
 rule MAE:
     input:
         expand(parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.Rds", 
-            dataset=parser.mae_ids,
+            dataset=parser.mae_ids.keys(),
             annotation=list(config["GENE_ANNOTATION"].keys())
         ),
         rules.Scripts_MAE_Results_Overview_R.output
@@ -48,13 +51,14 @@ rule create_SNVs:
     params:
         script=pathlib.Path(drop.__file__).parent / "modules/mae-pipeline/Scripts/MAE/filterSNVs.sh"
     output:
-        snvs_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz"
+        snvs_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
+        snvs_index=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz.tbi"
     shell:
         "{params.script} {input.vcf_file} {wildcards.vcf} {input.bam} {output.snvs_filename}"
 
 rule allelic_counts: 
     input:
-        snps_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}.vcf.gz",
+        snps_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
         bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
     params:
         script=pathlib.Path(drop.__file__).parent / "modules/mae-pipeline/Scripts/MAE/ASEReadCounter.sh"

@@ -30,3 +30,4 @@ $gatk ASEReadCounter -R $fasta -I ${bam_file} -V ${vcf_file} ${chr_subset} \
     | awk -v vcfrna="${vcf_id}--${rna_id}" \
     -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "mae_id"} NR>1{print $0, vcfrna}' \
     | gzip > ${output}
+

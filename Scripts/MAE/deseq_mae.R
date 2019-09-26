@@ -44,6 +44,6 @@ pt$MAX_AF = apply(pt, 1, max, na.rm=TRUE)
 
 rmae <- cbind(rmae, pt) %>% as.data.table()
 
-rmae[, rare := MAX_AF <= .001]
+rmae[, rare := MAX_AF <= snakemake@config$MAX_AF]
 
 saveRDS(rmae, snakemake@output$mae_res)

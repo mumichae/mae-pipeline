@@ -24,18 +24,24 @@ suppressPackageStartupMessages({
     devtools::load_all("tMAE")
 })
 
-
-
-mae_raw <- fread(snakemake@input$mae_counts, fill=TRUE)
-# mae_raw[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]
+# Read mae counts
+mae_counts <- fread(snakemake@input$mae_counts, fill=TRUE)
 
 # Function from MAE pkg
-rmae <- run_deseq_all_mae(mae_raw) ## build test for counting REF and ALT in MAE
-rmae[, sample := paste(snakemake@wildcards$vcf, snakemake@wildcards$rna, sep = "--")]
-
-
-setorderv(rmae, c('chr', 'pos'))
+rmae <- DESeq4MAE(mae_counts) ## build test for counting REF and ALT in MAE
 
 print("Done with deseq")
-saveRDS(rmae, snakemake@output$mae_res)
 
+# Add AF information from gnomAD
+if(gene_assembly == 'hg19'){
+    library(MafDb.gnomAD.r2.1.hs37d5)
+    mafdb <- MafDb.gnomAD.r2.1.hs37d5 
+} else if(gene_assembly == 'hg38'){
+    library(MafDb.gnomAD.r2.1.GRCh38)
+    mafdb <-MafDb.gnomAD.r2.1.GRCh38 
+}
+
+gr <- GRanges(seqnames = rmae$contig, ranges = IRanges(start = rmae$position, end = rmae$position), strand = '*')
+rmae$gnomAD_AF <- gscores(mafdb, gr)$AF
+
+saveRDS(rmae, snakemake@output$mae_res)

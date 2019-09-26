@@ -3,8 +3,7 @@ import os
 import drop
 import pathlib
 
-## ADD tmp/ DIR
-tmpdir = config["ROOT"] + '/' + config["DATASET_NAME"] + '/tmp'
+tmpdir = os.path.join(config["ROOT"], 'tmp')
 config["tmpdir"] = tmpdir
 if not os.path.exists(tmpdir+'/MAE'):
     os.makedirs(tmpdir+'/MAE')
@@ -44,39 +43,42 @@ rule QC:
         parser.getProcResultsDir() + "/mae/" + config["qc_group"] + "/dna_rna_qc_matrix.Rds",
         rules.Scripts_QC_DNA_RNA_matrix_plot_R.output
 
+MAE_ROOT = pathlib.Path(drop.__file__).parent / "modules/mae-pipeline"
 rule create_SNVs:
     input:
-        vcf_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['WES_ASSAY', 'WGS_ASSAY']),
-        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
+        vcf_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['WES_ASSAY', 'WGS_ASSAY']),
+        bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY'),
+        chr_conv1 = MAE_ROOT / "Scripts/MAE/chr_NCBI_UCSC.txt", 
+        chr_conv2 = MAE_ROOT / "Scripts/MAE/chr_UCSC_NCBI.txt"
     params:
-        script=pathlib.Path(drop.__file__).parent / "modules/mae-pipeline/Scripts/MAE/filterSNVs.sh"
+        script = MAE_ROOT / "Scripts/MAE/filterSNVs.sh"
     output:
         snvs_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
         snvs_index=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz.tbi"
     shell:
-        "{params.script} {input.vcf_file} {wildcards.vcf} {input.bam} {output.snvs_filename}"
+        "{params.script} {input.vcf_file} {wildcards.vcf} {input.bam_file} {output.snvs_filename}"
 
 rule allelic_counts: 
     input:
         snps_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
-        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
+        bam_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
     params:
         script=pathlib.Path(drop.__file__).parent / "modules/mae-pipeline/Scripts/MAE/ASEReadCounter.sh"
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:
-        "{params.script} {config[gatk]} {config[genome]} {input.bam} {input.snps_filename} {config[gatk_sanity_check]} {wildcards.vcf} {wildcards.rna} {output.counted}"
+        "{params.script} {config[gatk]} {config[genome]} {input.bam_file} {input.snps_filename} {config[gatk_sanity_check]} {wildcards.vcf} {wildcards.rna} {output.counted}"
 
 rule allelic_counts_qc: 
     input:
         snps_filename=config["qc_vcf"],
-        bam=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
+        bam_file=lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY')
     params:
         chrNames=" ".join(expand("-L {chr}", chr=config["chr_names"]))
     output:    
         counted=parser.getProcDataDir() + "/mae/allelic_counts_qc/{rna}.csv.gz"
     shell:
-        "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam} -V {input.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
+        "{config[gatk]} ASEReadCounter -R {config[genome]} -I {input.bam_file} -V {input.snps_filename} {params.chrNames} --disable-sequence-dictionary-validation {config[gatk_sanity_check]} | gzip > {output.counted}"
 
 
 ### RULEGRAPH  

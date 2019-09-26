@@ -10,7 +10,7 @@ rna_id=$7 # {rna_id}
 output=$8 # {output.counted}
 
 # get chr format
-vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | sort | uniq)
+vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
 
 if [ $(echo ${vcf_chr} | grep 'chr' | wc -l) -eq 0 ]
 then
@@ -22,12 +22,16 @@ else
 fi
 
 # subset from canonical chromosomes
-chr_subset=$(comm -1  <(cut -f1 -d" " ${canonical} | sort) <(echo ${vcf_chr}))
-chr_subset=$(echo $chr_subset | grep -v '^$' | sed -e 's/^/-L /' | tr '\n' ' ')
+chr_subset=$(comm -1  <(cut -f1 -d" " ${canonical} | sort) <(echo ${vcf_chr} | sort))
+chr_subset=$(echo $chr_subset | tr ' ' '\n' | sed -e 's/^/-L /' | tr '\n' ' ')
 
-$gatk ASEReadCounter -R $fasta -I ${bam_file} -V ${vcf_file} ${chr_subset} \
+$gatk ASEReadCounter \
+    -R $fasta \
+    -I ${bam_file} \
+    -V ${vcf_file} \
+    ${chr_subset} \
     --disable-sequence-dictionary-validation ${sanity} \
-    | awk -v vcfrna="${vcf_id}--${rna_id}" \
+   | awk -v vcfrna="${vcf_id}--${rna_id}" \
     -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "MAE_ID"} NR>1{print $0, vcfrna}' \
-    | gzip > ${output}
+    | bgzip > ${output}
 

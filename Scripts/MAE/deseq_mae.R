@@ -21,21 +21,14 @@ suppressPackageStartupMessages({
 # Read mae counts
 mae_counts <- fread(snakemake@input$mae_counts, fill=TRUE)
 
+print("Running DESeq...")
 # Function from MAE pkg
 rmae <- DESeq4MAE(mae_counts) ## build test for counting REF and ALT in MAE
 
-print("Done with deseq")
 
-# Add AF information from gnomAD
-if(gene_assembly == 'hg19'){
-    library(MafDb.gnomAD.r2.1.hs37d5)
-    mafdb <- MafDb.gnomAD.r2.1.hs37d5 
-} else if(gene_assembly == 'hg38'){
-    library(MafDb.gnomAD.r2.1.GRCh38)
-    mafdb <-MafDb.gnomAD.r2.1.GRCh38 
-}
-
-gr <- GRanges(seqnames = rmae$contig, ranges = IRanges(start = rmae$position, end = rmae$position), strand = '*')
-rmae$gnomAD_AF <- gscores(mafdb, gr)$AF
+### Add AF information from gnomAD
+print("Adding gnomAD allele frequencies...")
+rmae <- add_gnomAD_AF(rmae, gene_assembly = snakemake@config$gene_assembly,
+                      max_af_cutoff = snakemake@config$MAX_AF)
 
 saveRDS(rmae, snakemake@output$mae_res)

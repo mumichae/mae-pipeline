@@ -32,7 +32,7 @@ rmae <- DESeq4MAE(mae_counts) ## build test for counting REF and ALT in MAE
 
 print("Done with deseq")
 
-# Add AF information from gnomAD
+### Add AF information from gnomAD
 if(gene_assembly == 'hg19'){
     library(MafDb.gnomAD.r2.1.hs37d5)
     mafdb <- MafDb.gnomAD.r2.1.hs37d5 
@@ -41,7 +41,13 @@ if(gene_assembly == 'hg19'){
     mafdb <-MafDb.gnomAD.r2.1.GRCh38 
 }
 
+# Transform into GRanges object
 gr <- GRanges(seqnames = rmae$contig, ranges = IRanges(start = rmae$position, end = rmae$position), strand = '*')
-rmae$gnomAD_AF <- gscores(mafdb, gr)$AF
+# Add score of all, African, American, East Asian and Non-Finnish European
+pt <- score(mafdb, gr, pop=c('AF', 'AF_afr', 'AF_amr', 'AF_eas', 'AF_nfe'))
+# Compute the MAX_AF
+pt$MAX_AF = apply(pt, 1, max, na.rm=TRUE)
+
+rmae <- cbind(rmae, pt) %>% as.data.table()
 
 saveRDS(rmae, snakemake@output$mae_res)

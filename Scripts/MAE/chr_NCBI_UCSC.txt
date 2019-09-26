@@ -19,6 +19,7 @@
 19 chr19
 20 chr20
 21 chr21
+22 chr22
 X chrX
 Y chrY
 MT chrM

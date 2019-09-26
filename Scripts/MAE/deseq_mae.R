@@ -14,12 +14,6 @@ saveRDS(snakemake, paste0(snakemake@config$tmpdir,'/MAE/deseq_mae.snakemake'))
 # snakemake <- readRDS(paste0(snakemake@config$tmpdir, '/MAE/deseq_mae.snakemake'))
 
 suppressPackageStartupMessages({
-    library(dplyr)
-    library(data.table)
-    library(magrittr)
-    library(tidyr)
-    library(GenomicRanges)
-    library(SummarizedExperiment)
     ## LOAD tMAE package
     devtools::load_all("tMAE")
 })

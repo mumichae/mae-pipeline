@@ -30,6 +30,7 @@ $gatk ASEReadCounter \
     -I ${bam_file} \
     -V ${vcf_file} \
     ${chr_subset} \
+    --verbosity ERROR \
     --disable-sequence-dictionary-validation ${sanity} \
    | awk -v vcfrna="${vcf_id}--${rna_id}" \
     -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "MAE_ID"} NR>1{print $0, vcfrna}' \

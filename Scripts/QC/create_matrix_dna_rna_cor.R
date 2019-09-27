@@ -5,10 +5,10 @@
 #'  py:
 #'  - |
 #'   config["rna_ids_qc"] = parser.all_rna_ids
-#'   config["wes_ids_qc"] = parser.getSampleIDs(experiment="wes_assay")
+#'   config["wes_ids_qc"] = parser.getSampleIDs(experiment="WES_ASSAY")
 #'  input: 
 #'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() + "/mae/RNA_GT/{rna}.Rds", rna=parser.getRNAByGroup({wildcards.dataset}))`'
-#'    - vcf: '`sm parser.getFilePaths(assay="wes_assay")`'
+#'    - vcf: '`sm parser.getFilePaths(assay="WES_ASSAY")`'
 #'  output:
 #'    - mat_qc: '`sm parser.getProcResultsDir() + "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
 #'  threads: 50
@@ -49,7 +49,12 @@ lp <- bplapply(1:N, function(i){
   vcf_sample <- readVcf(input_vcf[i], param = param, row.names = FALSE)
   # Get GRanges and add Genotype
   gr_sample <- granges(vcf_sample)
-  mcols(gr_sample)$GT <- VariantAnnotation::geno(vcf_sample)$GT
+  gt <- VariantAnnotation::geno(vcf_sample)$GT
+  gt <- gsub('0|0', '0/0', gt, fixed = TRUE)
+  gt <- gsub('0|1', '0/1', gt, fixed = TRUE)
+  gt <- gsub('1|0', '0/1', gt, fixed = TRUE)
+  gt <- gsub('1|1', '1/1', gt, fixed = TRUE)
+  mcols(gr_sample)$GT <- x
   
   # Find overlaps between test and sample
   ov <- findOverlaps(gr_test, gr_sample, type = 'equal')

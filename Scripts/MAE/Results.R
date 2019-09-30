@@ -8,7 +8,7 @@
 #'  output:
 #'   - res_all: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.Rds"`' 
 #'   - res_signif: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_{annotation}.Rds"`'
-#'   - wBhtml: '`sm config["htmlOutputPath"] + "/mae/{dataset}--{annotation}_results.html"`'
+#'   - wBhtml: '`sm config["htmlOutputPath"] + "/MAE/{dataset}--{annotation}_results.html"`'
 #'  type: noindex
 #'---
 

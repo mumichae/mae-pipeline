@@ -7,7 +7,7 @@
 #'    annotations = list(config["GENE_ANNOTATION"].keys())
 #'    datasets = config["mae_groups"]
 #'  input:
-#'   - html: '`sm expand(config["htmlOutputPath"] + "/mae/{dataset}--{annotation}_results.html", annotation=annotations, dataset=datasets)`'
+#'   - html: '`sm expand(config["htmlOutputPath"] + "/MAE/{dataset}--{annotation}_results.html", annotation=annotations, dataset=datasets)`'
 #' output:
 #'  html_document
 #'---

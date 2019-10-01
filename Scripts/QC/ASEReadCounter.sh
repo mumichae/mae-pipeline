@@ -2,8 +2,8 @@
 
 # 1 {input.ncbi2ucsc}
 # 2 {input.ucsc2ncbi}
-# 3 {input.vcf_file}
-# 4 {wildcards.vcf}
+# 3 {input.vcf_file_ucsc}
+# 4 {input.vcf_file_ncbi}
 # 5 {input.bam_file}
 # 6 {wildcards.rna}
 # 7 {config[genome]}
@@ -12,26 +12,32 @@
 
 ncbi2ucsc=$1
 ucsc2ncbi=$2
-vcf_file=$3
-vcf_id=$4
+vcf_file_ucsc=$3
+vcf_file_ncbi=$4
 bam_file=$5
 rna_id=$6
 fasta=$7
 sanity=$8
 output=$9
 
-# get chr format
-vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
+echo $ncbi2ucsc
 
-if [ $(echo ${vcf_chr} | grep 'chr' | wc -l) -eq 0 ]
+# get number of UCSC chromosomes in BAM
+bam_chr=$(samtools idxstats ${bam_file} | grep chr | wc -l)
+
+if [ ${bam_chr} -eq 0 ]
 then
-    echo "use NCBI format"
-    canonical=$ncbi2ucsc
-else
     echo "use UCSC format"
+    canonical=$ncbi2ucsc
+    vcf_file=$vcf_file_ucsc
+else
+    echo "use NCBI format"
     canonical=$ucsc2ncbi
+    vcf_file=$vcf_file_ncbi
 fi
 
+# get unique chromosomes
+vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
 # subset from canonical chromosomes
 chr_subset=$(comm -1  <(cut -f1 -d" " ${canonical} | sort) <(echo ${vcf_chr} | sort))
 chr_subset=$(echo $chr_subset | tr ' ' '\n' | sed -e 's/^/-L /' | tr '\n' ' ')
@@ -43,7 +49,7 @@ gatk ASEReadCounter \
     ${chr_subset} \
     --verbosity ERROR \
     --disable-sequence-dictionary-validation ${sanity} \
-   | awk -v vcfrna="${vcf_id}--${rna_id}" \
-    -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "MAE_ID"} NR>1{print $0, vcfrna}' \
+   | awk -v rnaID="${rna_id}" \
+    -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "RNA_ID"} NR>1{print $0, rnaID}' \
     | bgzip > ${output}
 

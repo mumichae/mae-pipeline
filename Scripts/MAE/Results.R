@@ -6,8 +6,8 @@
 #'   - mae_res: '`sm lambda wildcards: expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = parser.getMaeByGroup({wildcards.dataset}))`'
 #'   - gene_name_mapping: '`sm parser.getProcDataDir() + "/mae/gene_name_mapping_{annotation}.tsv"`'
 #'  output:
-#'   - res_all: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.Rds"`' 
-#'   - res_signif: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_{annotation}.Rds"`'
+#'   - res_all: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.tsv.gz"`' 
+#'   - res_signif: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_{annotation}.tsv"`'
 #'   - wBhtml: '`sm config["htmlOutputPath"] + "/MAE/{dataset}--{annotation}_results.html"`'
 #'  type: noindex
 #'---
@@ -23,6 +23,7 @@ suppressPackageStartupMessages({
   library(GenomicRanges)
   library(SummarizedExperiment)
   library(dplyr)
+  library(R.utils)
 })
    
 # Read all MAE results files
@@ -75,9 +76,12 @@ res[, MAE_ALT := MAE == TRUE & altFreq > .8]
 #' Number of samples with significant MA for alternative events
 uniqueN(res[MAE_ALT == TRUE, MAE_ID])
 
-#' ### Save results 
+#' ### Save the results
+unzipped_file <- unlist(strsplit(snakemake@output$res_all, split = ".gz"))
+fwrite(res, unzipped_file, sep = '\t', row.names = F, quote = F)
+gzip(unzipped_file)
 saveRDS(res, snakemake@output$res_all)
-saveRDS(res[MAE_ALT == TRUE], snakemake@output$res_signif)
+fwrite(res[MAE_ALT == TRUE], snakemake@output$res_signif, sep = '\t', row.names = F, quote = F)
 
 
 #+echo=F

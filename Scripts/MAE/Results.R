@@ -69,9 +69,10 @@ uniqueN(res$MAE_ID)
 #' Total number of genes
 uniqueN(res$gene_name)
 
-#' ### Subset for significant events (padj < .05 & frequency of alternative > .8)
-res[, MAE := padj < .05]
-res[, MAE_ALT := MAE == TRUE & altFreq > .8]
+#' ### Subset for significant events
+res[, MAE := padj <= snakemake@config$mae_padjCutoff]
+mae_freqCutoff <- max(snakemake@config$mae_freqCutoff, 1-snakemake@config$mae_freqCutoff)
+res[, MAE_ALT := MAE == TRUE & altFreq >= snakemake@config$mae_freqCutoff]
 
 #' Number of samples with significant MA for alternative events
 uniqueN(res[MAE_ALT == TRUE, MAE_ID])

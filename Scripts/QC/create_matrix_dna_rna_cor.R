@@ -29,7 +29,7 @@ suppressPackageStartupMessages({
 register(MulticoreParam(snakemake@threads))
 
 # Read the test vcf as GRanges
-gr_test <- readVcf("/s/project/genetic_diagnosis/resource/qc_ucsc.vcf.gz") %>% granges()
+gr_test <- readVcf(snakemake@config$qc_vcf) %>% granges()
 mcols(gr_test)$GT <- "0/0"
 
 # Read the vcf and rna files
@@ -49,7 +49,7 @@ lp <- bplapply(1:N, function(i){
   vcf_sample <- readVcf(input_vcf[i], param = param, row.names = FALSE)
   # Get GRanges and add Genotype
   gr_sample <- granges(vcf_sample)
-  gt <- VariantAnnotation::geno(vcf_sample)$GT
+  gt <- geno(vcf_sample)$GT
   gt <- gsub('0|0', '0/0', gt, fixed = TRUE)
   gt <- gsub('0|1', '0/1', gt, fixed = TRUE)
   gt <- gsub('1|0', '0/1', gt, fixed = TRUE)
@@ -57,8 +57,9 @@ lp <- bplapply(1:N, function(i){
   mcols(gr_sample)$GT <- x
   
   # Find overlaps between test and sample
-  ov <- findOverlaps(gr_test, gr_sample, type = 'equal')
   gr_res <- copy(gr_test)
+  seqlevelsStyle(gr_res) <- seqlevelsStyle(gr_sample)  # Make chr style the same
+  ov <- findOverlaps(gr_res, gr_sample, type = 'equal')
   mcols(gr_res)[from(ov),]$GT <- mcols(gr_sample)[to(ov),]$GT
   
   # Find simmilarity between DNA sample and RNA sample

@@ -70,9 +70,10 @@ uniqueN(res$MAE_ID)
 uniqueN(res$gene_name)
 
 #' ### Subset for significant events
-res[, MAE := padj <= snakemake@config$mae_padjCutoff]
-mae_freqCutoff <- max(snakemake@config$mae_freqCutoff, 1-snakemake@config$mae_freqCutoff)
-res[, MAE_ALT := MAE == TRUE & altFreq >= snakemake@config$mae_freqCutoff]
+allelicRatioCutoff <- config$allelicRatioCutoff
+res[, MAE := padj <= snakemake@config$mae_padjCutoff & 
+       (altRatio >= allelicRatioCutoff | altRatio <= (1-allelicRatioCutoff))] 
+res[, MAE_ALT := MAE == TRUE & altFreq >= allelicRatioCutoff]
 
 #' Number of samples with significant MA for alternative events
 uniqueN(res[MAE_ALT == TRUE, MAE_ID])

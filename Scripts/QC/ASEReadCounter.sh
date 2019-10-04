@@ -20,36 +20,49 @@ fasta=$7
 sanity=$8
 output=$9
 
-echo $ncbi2ucsc
+tmp=$(mktemp)
+header="contig\tposition\tvariantID\trefAllele\taltAllele\t"
+header+="refCount\taltCount\ttotalCount\tlowMAPQDepth\t"
+header+="lowBaseQDepth\trawDepth\totherBases\timproperPairs\n"
+echo -e $header >> $tmp
+
 
 # get number of UCSC chromosomes in BAM
 bam_chr=$(samtools idxstats ${bam_file} | grep chr | wc -l)
-
-if [ ${bam_chr} -eq 0 ]
+if [ ${bam_chr} -ne 0 ]
 then
     echo "use UCSC format"
-    canonical=$ncbi2ucsc
+    canonical=$ucsc2ncbi
     vcf_file=$vcf_file_ucsc
 else
     echo "use NCBI format"
-    canonical=$ucsc2ncbi
+    canonical=$ncbi2ucsc
     vcf_file=$vcf_file_ncbi
 fi
 
 # get unique chromosomes
 vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
 # subset from canonical chromosomes
-chr_subset=$(comm -1  <(cut -f1 -d" " ${canonical} | sort) <(echo ${vcf_chr} | sort))
-chr_subset=$(echo $chr_subset | tr ' ' '\n' | sed -e 's/^/-L /' | tr '\n' ' ')
+chr_subset=$(comm -12  <(cut -f1 -d" " ${canonical} | sort -u) <(echo ${vcf_chr} | xargs -n1 | sort -u))
 
-gatk ASEReadCounter \
-    -R $fasta \
+for chr in $chr_subset
+do
+    echo $chr1
+    gatk ASEReadCounter \
+    -R ${fasta} \
     -I ${bam_file} \
     -V ${vcf_file} \
-    ${chr_subset} \
+    -L ${chr} \
     --verbosity ERROR \
     --disable-sequence-dictionary-validation ${sanity} \
-   | awk -v rnaID="${rna_id}" \
+    | tail -n+2 >> $tmp
+done
+
+cat $tmp | awk -v rnaID="${rna_id}" \
     -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "RNA_ID"} NR>1{print $0, rnaID}' \
     | bgzip > ${output}
+
+rm ${tmp}
+exit 1
+
 

@@ -20,9 +20,14 @@ fasta=$7
 sanity=$8
 output=$9
 
+tmp=$(mktemp)
+header="contig\tposition\tvariantID\trefAllele\taltAllele\t"
+header+="refCount\taltCount\ttotalCount\tlowMAPQDepth\t"
+header+="lowBaseQDepth\trawDepth\totherBases\timproperPairs\n"
+echo -e $header >> $tmp
+
 # get chr format
 vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
-
 if [ $(echo ${vcf_chr} | grep 'chr' | wc -l) -eq 0 ]
 then
     echo "use NCBI format"
@@ -31,19 +36,26 @@ else
     echo "use UCSC format"
     canonical=$ucsc2ncbi
 fi
-
 # subset from canonical chromosomes
-chr_subset=$(comm -1  <(cut -f1 -d" " ${canonical} | sort) <(echo ${vcf_chr} | sort))
-chr_subset=$(echo $chr_subset | tr ' ' '\n' | sed -e 's/^/-L /' | tr '\n' ' ')
+chr_subset=$(comm -12  <(cut -f1 -d" " ${canonical} | sort -u) <(echo ${vcf_chr} | xargs -n1 | sort -u))
+#chr_subset=$(echo $chr_subset | tr ' ' '\n' | sed -e 's/^/-L /' | tr '\n' ' ')
 
-gatk ASEReadCounter \
-    -R $fasta \
+for chr in $chr_subset
+do
+    echo $chr1
+    gatk ASEReadCounter \
+    -R ${fasta} \
     -I ${bam_file} \
     -V ${vcf_file} \
-    ${chr_subset} \
+    -L ${chr} \
     --verbosity ERROR \
     --disable-sequence-dictionary-validation ${sanity} \
-   | awk -v vcfrna="${vcf_id}--${rna_id}" \
+    | tail -n+2 >> $tmp
+done
+
+cat $tmp | awk -v vcfrna="${vcf_id}--${rna_id}" \
     -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "MAE_ID"} NR>1{print $0, vcfrna}' \
     | bgzip > ${output}
+
+rm ${tmp}
 

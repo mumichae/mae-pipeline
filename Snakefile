@@ -30,8 +30,8 @@ rule create_SNVs:
     input:
         ncbi2ucsc = MAE_ROOT / "resource/chr_NCBI_UCSC.txt",
         ucsc2ncbi = MAE_ROOT / "resource/chr_UCSC_NCBI.txt",
-        vcf_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['WES_ASSAY', 'WGS_ASSAY']),
-        bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY'),
+        vcf_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, assay=['DNA_ID']),
+        bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ID'),
         script = MAE_ROOT / "Scripts/MAE/filterSNVs.sh"
     output:
         snvs_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
@@ -47,7 +47,7 @@ rule allelic_counts:
         ncbi2ucsc = MAE_ROOT / "resource/chr_NCBI_UCSC.txt",
         ucsc2ncbi = MAE_ROOT / "resource/chr_UCSC_NCBI.txt",
         vcf_file = parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
-        bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY'),
+        bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ID'),
         script = MAE_ROOT / "Scripts/MAE/ASEReadCounter.sh"
     output:    
         counted = parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
@@ -64,7 +64,7 @@ rule allelic_counts_qc:
         ucsc2ncbi = MAE_ROOT / "resource/chr_UCSC_NCBI.txt",
         vcf_file_ucsc = config["qc_vcf"]["UCSC"],
         vcf_file_ncbi = config["qc_vcf"]["NCBI"],
-        bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ASSAY'),
+        bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, assay='RNA_ID'),
         script = MAE_ROOT / "Scripts/QC/ASEReadCounter.sh"
     output:    
         counted = parser.getProcDataDir() + "/mae/allelic_counts_qc/{rna}.csv.gz"

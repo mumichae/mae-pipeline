@@ -63,6 +63,5 @@ cat $tmp | awk -v rnaID="${rna_id}" \
     | bgzip > ${output}
 
 rm ${tmp}
-exit 1
 
 

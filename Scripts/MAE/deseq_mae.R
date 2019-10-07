@@ -24,7 +24,7 @@ mae_counts <- fread(snakemake@input$mae_counts, fill=TRUE)
 mae_counts[, position := as.numeric(position)]
 
 # Sort by chr
-mae_counts$contig <- str_sort(mae_counts$contig, numeric = TRUE)
+mae_counts[, contig := factor(contig, levels = unique(str_sort(mae_counts$contig, numeric = TRUE)))]
 
 print("Running DESeq...")
 # Function from MAE pkg

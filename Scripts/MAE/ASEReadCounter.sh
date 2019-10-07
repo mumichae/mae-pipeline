@@ -42,7 +42,7 @@ chr_subset=$(comm -12  <(cut -f1 -d" " ${canonical} | sort -u) <(echo ${vcf_chr}
 
 for chr in $chr_subset
 do
-    echo $chr1
+    echo $chr
     gatk ASEReadCounter \
     -R ${fasta} \
     -I ${bam_file} \

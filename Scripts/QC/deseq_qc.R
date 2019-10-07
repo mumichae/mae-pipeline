@@ -13,20 +13,19 @@ saveRDS(snakemake, paste0(snakemake@config$tmpdir,'/MAE/deseq_qc.snakemake'))
 # snakemake <- readRDS('paste0(snakemake@config$tmpdir,'MAE/deseq_qc.snakemake'))
 
 suppressPackageStartupMessages({
-  library(data.table)
   library(GenomicRanges)
   devtools::load_all("tMAE")
 })
 
 # Read MA counts for qc
 qc_counts <- fread(snakemake@input$qc_counts, fill=TRUE)
-qc_counts <- qc_counts[!is.na(position)]
+# qc_counts <- qc_counts[!is.na(position)]
 
 # Run DESeq
 rmae <- DESeq4MAE(qc_counts, minCoverage = 10)
 rmae[, RNA_GT := '0/1']
-rmae[altFreq < .2, RNA_GT := '0/0']
-rmae[altFreq > .8, RNA_GT := '1/1']
+rmae[altRatio < .2, RNA_GT := '0/0']
+rmae[altRatio > .8, RNA_GT := '1/1']
 
 # Convert to granges
 qc_gr <- GRanges(seqnames = rmae$contig, 

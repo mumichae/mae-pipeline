@@ -26,6 +26,7 @@ rmae <- DESeq4MAE(qc_counts, minCoverage = 10)
 rmae[, RNA_GT := '0/1']
 rmae[altRatio < .2, RNA_GT := '0/0']
 rmae[altRatio > .8, RNA_GT := '1/1']
+rmae[, position := as.numeric(position)]
 
 # Convert to granges
 qc_gr <- GRanges(seqnames = rmae$contig, 

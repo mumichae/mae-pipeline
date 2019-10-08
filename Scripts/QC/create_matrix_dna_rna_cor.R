@@ -78,5 +78,4 @@ mat <- do.call(rbind, lp)
 row.names(mat) <- wes_samples
 colnames(mat) <- rna_samples
 
-
 saveRDS(mat, snakemake@output$mat_qc)

@@ -89,7 +89,7 @@ import oyaml
 with open(tmpdir + '/config.yaml', 'w') as yaml_file:
     oyaml.dump(config, yaml_file, default_flow_style=False)
 
-rulegraph_filename = htmlOutputPath + "/" + os.path.basename(os.getcwd()) + "_rulegraph"
+rulegraph_filename = htmlOutputPath + "/MAE_rulegraph" # htmlOutputPath + "/" + os.path.basename(os.getcwd()) + "_rulegraph"
 rule produce_rulegraph:
     input:
         expand(rulegraph_filename + ".{fmt}", fmt=["svg", "png"])

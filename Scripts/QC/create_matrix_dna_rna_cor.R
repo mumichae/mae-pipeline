@@ -36,7 +36,6 @@ mcols(gr_test)$GT <- "0/0"
 input_vcf <- snakemake@input$vcf
 wes_samples <- snakemake@config$wes_ids_qc
 
-
 rna_samples <- snakemake@config$rna_ids_qc[[snakemake@wildcards$dataset]]
 mae_res <- snakemake@input$mae_res
 

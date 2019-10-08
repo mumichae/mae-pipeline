@@ -16,7 +16,12 @@ include: config['wBuildPath'] + "/wBuild.snakefile"
 
 rule all:
     input: 
-        rules.Index.output
+        rules.Index.output, 
+        expand(
+            parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_{annotation}.tsv",
+            dataset=parser.mae_ids.keys(), annotation=list(config["GENE_ANNOTATION"].keys())
+        ),
+        parser.getProcResultsDir() + "/mae/" + config["qc_group"] + "/dna_rna_qc_matrix.Rds"
     output: touch(tmpdir + "/MAE.done")
 
 # create folders for mae results for rule allelic counts

@@ -23,7 +23,7 @@ output=$9
 tmp=$(mktemp)
 header="contig\tposition\tvariantID\trefAllele\taltAllele\t"
 header+="refCount\taltCount\ttotalCount\tlowMAPQDepth\t"
-header+="lowBaseQDepth\trawDepth\totherBases\timproperPairs\n"
+header+="lowBaseQDepth\trawDepth\totherBases\timproperPairs"
 echo -e $header >> $tmp
 
 # get chr format

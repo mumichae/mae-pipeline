@@ -35,6 +35,7 @@ rmae <- lapply(snakemake@input$mae_res, function(m){
 
 # Add gene names
 gene_annot_dt <- fread(snakemake@input$gene_name_mapping)
+gene_annot_dt <- gene_annot_dt[seqnames %in% paste0('chr', c(1:22, 'X'))]
 
 # Subtract the genomic ranges from the annotation and results and overlap them
 gene_annot_ranges <- GRanges(seqnames = gene_annot_dt$seqnames, 
@@ -70,10 +71,10 @@ uniqueN(res$MAE_ID)
 uniqueN(res$gene_name)
 
 #' ### Subset for significant events
-allelicRatioCutoff <- config$allelicRatioCutoff
+allelicRatioCutoff <- snakemake@config$allelicRatioCutoff
 res[, MAE := padj <= snakemake@config$mae_padjCutoff & 
        (altRatio >= allelicRatioCutoff | altRatio <= (1-allelicRatioCutoff))] 
-res[, MAE_ALT := MAE == TRUE & altFreq >= allelicRatioCutoff]
+res[, MAE_ALT := MAE == TRUE & altRatio >= allelicRatioCutoff]
 
 #' Number of samples with significant MA for alternative events
 uniqueN(res[MAE_ALT == TRUE, MAE_ID])
@@ -105,6 +106,8 @@ ggplot(melt_dt, aes(variable, value)) + geom_boxplot() +
   scale_y_log10() + theme_bw(base_size = 14) +
   labs(y = 'Heterozygous SNVs per patient', x = '')
 
+# Medians
+melt_dt[, .(median = median(value, na.rm = T)), by = variable]
 
 #' 
 #' ## Results table

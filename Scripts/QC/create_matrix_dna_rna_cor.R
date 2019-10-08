@@ -36,6 +36,7 @@ mcols(gr_test)$GT <- "0/0"
 input_vcf <- snakemake@input$vcf
 wes_samples <- snakemake@config$wes_ids_qc
 
+
 rna_samples <- snakemake@config$rna_ids_qc[[snakemake@wildcards$dataset]]
 mae_res <- snakemake@input$mae_res
 
@@ -53,7 +54,7 @@ lp <- bplapply(1:N, function(i){
   gt <- gsub('0|1', '0/1', gt, fixed = TRUE)
   gt <- gsub('1|0', '0/1', gt, fixed = TRUE)
   gt <- gsub('1|1', '1/1', gt, fixed = TRUE)
-  mcols(gr_sample)$GT <- x
+  mcols(gr_sample)$GT <- gt
   
   # Find overlaps between test and sample
   gr_res <- copy(gr_test)
@@ -76,5 +77,6 @@ lp <- bplapply(1:N, function(i){
 mat <- do.call(rbind, lp)
 row.names(mat) <- wes_samples
 colnames(mat) <- rna_samples
+
 
 saveRDS(mat, snakemake@output$mat_qc)

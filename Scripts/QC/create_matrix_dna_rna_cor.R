@@ -29,7 +29,7 @@ suppressPackageStartupMessages({
 register(MulticoreParam(snakemake@threads))
 
 # Read the test vcf as GRanges
-gr_test <- readVcf(snakemake@config$qc_vcf) %>% granges()
+gr_test <- readVcf(snakemake@config$qc_vcf$UCSC) %>% granges()
 mcols(gr_test)$GT <- "0/0"
 
 # Read the vcf and rna files

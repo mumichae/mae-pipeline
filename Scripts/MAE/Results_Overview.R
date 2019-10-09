@@ -16,7 +16,7 @@
 saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake") )
 # snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake")
 
-groups <- names(snakemake@config$mae_groups)
+groups <- names(snakemake@config$mae$groups)
 gene_annotation_names <- names(snakemake@config$geneAnnotation)
 
 titles <- paste(gene_annotation_names, groups)

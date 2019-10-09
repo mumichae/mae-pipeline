@@ -71,8 +71,8 @@ uniqueN(res$MAE_ID)
 uniqueN(res$gene_name)
 
 #' ### Subset for significant events
-allelicRatioCutoff <- snakemake@config$allelicRatioCutoff
-res[, MAE := padj <= snakemake@config$mae_padjCutoff & 
+allelicRatioCutoff <- snakemake@config$mae$allelicRatioCutoff
+res[, MAE := padj <= snakemake@config$mae$padjCutoff & 
        (altRatio >= allelicRatioCutoff | altRatio <= (1-allelicRatioCutoff))] 
 res[, MAE_ALT := MAE == TRUE & altRatio >= allelicRatioCutoff]
 

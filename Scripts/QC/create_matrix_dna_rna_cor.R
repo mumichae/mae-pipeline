@@ -4,8 +4,8 @@
 #' wb:
 #'  py:
 #'  - |
-#'   config["rna_ids_qc"] = parser.all_rna_ids
-#'   config["wes_ids_qc"] = parser.getSampleIDs(file_type="DNA_VCF_FILE")
+#'   config["mae"]["qcIdsRNA"] = parser.all_rna_ids
+#'   config["mae"]["qcIdsWES"] = parser.getSampleIDs(file_type="DNA_VCF_FILE")
 #'  input: 
 #'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() + "/mae/RNA_GT/{rna}.Rds", rna=parser.getRNAByGroup({wildcards.dataset}))`'
 #'    - vcf: '`sm parser.getFilePaths(file_type="DNA_VCF_FILE")`'
@@ -29,15 +29,15 @@ suppressPackageStartupMessages({
 register(MulticoreParam(snakemake@threads))
 
 # Read the test vcf as GRanges
-gr_test <- readVcf(snakemake@config$qc_vcf$UCSC) %>% granges()
+gr_test <- readVcf(snakemake@config$mae$qcVcf$UCSC) %>% granges()
 mcols(gr_test)$GT <- "0/0"
 
 # Read the vcf and rna files
 input_vcf <- snakemake@input$vcf
-wes_samples <- snakemake@config$wes_ids_qc
+wes_samples <- snakemake@config$mae$qcIdsWES
 
 
-rna_samples <- snakemake@config$rna_ids_qc[[snakemake@wildcards$dataset]]
+rna_samples <- snakemake@config$mae$qcIdsRNA[[snakemake@wildcards$dataset]]
 mae_res <- snakemake@input$mae_res
 
 N <- length(input_vcf)

@@ -4,8 +4,8 @@
 #' wb:
 #'  py:
 #'   - |
-#'    annotations = list(config["GENE_ANNOTATION"].keys())
-#'    datasets = config["mae_groups"]
+#'    annotations = list(config["geneAnnotation"].keys())
+#'    datasets = config["mae"]["groups"]
 #'  input:
 #'   - html: '`sm expand(config["htmlOutputPath"] + "/MAE/{dataset}--{annotation}_results.html", annotation=annotations, dataset=datasets)`'
 #' output:
@@ -17,7 +17,7 @@ saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake") )
 # snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake")
 
 groups <- names(snakemake@config$mae_groups)
-gene_annotation_names <- names(snakemake@config$GENE_ANNOTATION)
+gene_annotation_names <- names(snakemake@config$geneAnnotation)
 
 titles <- paste(gene_annotation_names, groups)
 summaries <- paste('[', titles ,'](', gsub(snakemake@config$htmlOutputPath, ".", snakemake@input$html), ')', sep = '')

@@ -3,11 +3,6 @@ import os
 import drop
 import pathlib
 
-tmpdir = os.path.join(config["ROOT"], 'tmp')
-config["tmpdir"] = tmpdir
-if not os.path.exists(tmpdir+'/MAE'):
-    os.makedirs(tmpdir+'/MAE')
-
 parser = drop.config(config)
 config = parser.config
 MAE_ROOT = pathlib.Path(drop.__file__).parent / "modules/mae-pipeline"
@@ -19,9 +14,9 @@ rule all:
         rules.Index.output, 
         expand(
             parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_{annotation}.tsv",
-            dataset=parser.mae_ids.keys(), annotation=list(config["GENE_ANNOTATION"].keys())
+            dataset=parser.mae_ids.keys(), annotation=list(config["geneAnnotation"].keys())
         ),
-        parser.getProcResultsDir() + "/mae/" + config["qc_group"] + "/dna_rna_qc_matrix.Rds"
+        parser.getProcResultsDir() + "/mae/" + config["mae"]["qcGroup"] + "/dna_rna_qc_matrix.Rds"
     output: touch(tmpdir + "/MAE.done")
 
 # create folders for mae results for rule allelic counts
@@ -60,15 +55,15 @@ rule allelic_counts:
         """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} \
         {input.vcf_file} {wildcards.vcf} {input.bam_file} {wildcards.rna} \
-        {config[genome]} {config[gatk_sanity_check]} {output.counted}
+        {config[mae][genome]} {config[mae][gatkIgnoreHeaderCheck]} {output.counted}
         """
 
 rule allelic_counts_qc: 
     input:
         ncbi2ucsc = MAE_ROOT / "resource/chr_NCBI_UCSC.txt",
         ucsc2ncbi = MAE_ROOT / "resource/chr_UCSC_NCBI.txt",
-        vcf_file_ucsc = config["qc_vcf"]["UCSC"],
-        vcf_file_ncbi = config["qc_vcf"]["NCBI"],
+        vcf_file_ucsc = config["mae"]["qcVcf"]["UCSC"],
+        vcf_file_ncbi = config["mae"]["qcVcf"]["NCBI"],
         bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, file_type='RNA_BAM_FILE'),
         script = MAE_ROOT / "Scripts/QC/ASEReadCounter.sh"
     output:    
@@ -77,7 +72,7 @@ rule allelic_counts_qc:
         """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} \
         {input.vcf_file_ucsc} {input.vcf_file_ncbi} {input.bam_file} {wildcards.rna} \
-        {config[genome]} {config[gatk_sanity_check]} {output.counted}
+        {config[mae][genome]} {config[mae][gatkIgnoreHeaderCheck]} {output.counted}
         """
 
 

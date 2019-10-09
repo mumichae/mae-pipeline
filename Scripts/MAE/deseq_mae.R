@@ -32,7 +32,7 @@ rmae <- DESeq4MAE(mae_counts) ## build test for counting REF and ALT in MAE
 
 ### Add AF information from gnomAD
 print("Adding gnomAD allele frequencies...")
-rmae <- add_gnomAD_AF(rmae, gene_assembly = snakemake@config$gene_assembly,
-                      max_af_cutoff = snakemake@config$MAX_AF)
+rmae <- add_gnomAD_AF(rmae, gene_assembly = snakemake@config$mae$geneAssembly,
+                      max_af_cutoff = snakemake@config$mae$maxAF)
 
 saveRDS(rmae, snakemake@output$mae_res)

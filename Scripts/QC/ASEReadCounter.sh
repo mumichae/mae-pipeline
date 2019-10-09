@@ -6,8 +6,8 @@
 # 4 {input.vcf_file_ncbi}
 # 5 {input.bam_file}
 # 6 {wildcards.rna}
-# 7 {config[genome]}
-# 8 {config[gatk_sanity_check]}
+# 7 {config[mae][genome]}
+# 8 {config[mae][gatkIgnoreHeaderCheck]}
 # 9 {output.counted}
 
 ncbi2ucsc=$1

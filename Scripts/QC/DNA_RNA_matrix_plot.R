@@ -3,7 +3,7 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'    - mat_qc: '`sm parser.getProcResultsDir()+"/mae/"+config["qc_group"]+"/dna_rna_qc_matrix.Rds"`'
+#'    - mat_qc: '`sm parser.getProcResultsDir()+"/mae/"+config["mae"]["qcGroup"]+"/dna_rna_qc_matrix.Rds"`'
 #' output: 
 #'   html_document:
 #'    code_folding: hide

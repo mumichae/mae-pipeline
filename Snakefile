@@ -8,7 +8,7 @@ config = parser.config
 include: config['wBuildPath'] + "/wBuild.snakefile"
 
 MAE_ROOT = pathlib.Path(drop.__file__).parent / "modules/mae-pipeline"
-TMP_DIR = os.path.join(config['root'], 'tmp')
+TMP_DIR = drop.getTmpDir()
 
 rule all:
     input: 

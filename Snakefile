@@ -5,9 +5,10 @@ import pathlib
 
 parser = drop.config(config)
 config = parser.config
-MAE_ROOT = pathlib.Path(drop.__file__).parent / "modules/mae-pipeline"
-
 include: config['wBuildPath'] + "/wBuild.snakefile"
+
+MAE_ROOT = pathlib.Path(drop.__file__).parent / "modules/mae-pipeline"
+TMP_DIR = os.path.join(config['root'], 'tmp')
 
 rule all:
     input: 
@@ -17,7 +18,7 @@ rule all:
             dataset=parser.mae_ids.keys(), annotation=list(config["geneAnnotation"].keys())
         ),
         parser.getProcResultsDir() + "/mae/" + config["mae"]["qcGroup"] + "/dna_rna_qc_matrix.Rds"
-    output: touch(tmpdir + "/MAE.done")
+    output: touch(TMP_DIR + "/MAE.done")
 
 # create folders for mae results for rule allelic counts
 dirs = [parser.getProcDataDir() + "/mae/snvs", parser.getProcDataDir() + "/mae/allelic_counts"]
@@ -37,7 +38,7 @@ rule create_SNVs:
         snvs_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
         snvs_index=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz.tbi"
     shell:
-        """
+        """z
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} {input.vcf_file} {wildcards.vcf} \
         {input.bam_file} {output.snvs_filename}
         """
@@ -81,7 +82,7 @@ rule allelic_counts_qc:
 
 ## For rule rulegraph.. copy configfile in tmp file
 import oyaml
-with open(tmpdir + '/config.yaml', 'w') as yaml_file:
+with open(TMP_DIR + '/config.yaml', 'w') as yaml_file:
     oyaml.dump(config, yaml_file, default_flow_style=False)
 
 rulegraph_filename = config["htmlOutputPath"] + "/MAE_rulegraph" # htmlOutputPath + "/" + os.path.basename(os.getcwd()) + "_rulegraph"
@@ -93,7 +94,7 @@ rule create_graph:
     output:
         rulegraph_filename + ".dot"
     shell:
-        "snakemake --configfile " + tmpdir + "/config.yaml --rulegraph > {output}"
+        "snakemake --configfile " + TMP_DIR + "/config.yaml --rulegraph > {output}"
 
 rule render_dot:
     input:

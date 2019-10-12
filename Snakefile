@@ -7,8 +7,9 @@ parser = drop.config(config)
 config = parser.config
 include: config['wBuildPath'] + "/wBuild.snakefile"
 
-MAE_ROOT = pathlib.Path(drop.__file__).parent / "modules/mae-pipeline"
-TMP_DIR = drop.getTmpDir()
+METHOD = 'MAE'
+SCRIPT_ROOT = drop.getMethodPath(METHOD, link_type='workdir')
+TMP_DIR = config['tmpdir']
 
 rule all:
     input: 
@@ -18,7 +19,7 @@ rule all:
             dataset=parser.mae_ids.keys(), annotation=list(config["geneAnnotation"].keys())
         ),
         parser.getProcResultsDir() + "/mae/" + config["mae"]["qcGroup"] + "/dna_rna_qc_matrix.Rds"
-    output: touch(TMP_DIR + "/MAE.done")
+    output: touch(drop.getMethodPath(METHOD, link_type='final_file', tmp_dir=TMP_DIR))
 
 # create folders for mae results for rule allelic counts
 dirs = [parser.getProcDataDir() + "/mae/snvs", parser.getProcDataDir() + "/mae/allelic_counts"]
@@ -29,27 +30,27 @@ for dir_ in dirs:
 
 rule create_SNVs:
     input:
-        ncbi2ucsc = MAE_ROOT / "resource/chr_NCBI_UCSC.txt",
-        ucsc2ncbi = MAE_ROOT / "resource/chr_UCSC_NCBI.txt",
+        ncbi2ucsc = os.path.join(SCRIPT_ROOT, "resource", "chr_NCBI_UCSC.txt"),
+        ucsc2ncbi = os.path.join(SCRIPT_ROOT, "resource", "chr_UCSC_NCBI.txt"),
         vcf_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, file_type='DNA_VCF_FILE'),
         bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, file_type='RNA_BAM_FILE'),
-        script = MAE_ROOT / "Scripts/MAE/filterSNVs.sh"
+        script = os.path.join(SCRIPT_ROOT, "Scripts", "MAE", "filterSNVs.sh")
     output:
         snvs_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
         snvs_index=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz.tbi"
     shell:
-        """z
+        """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} {input.vcf_file} {wildcards.vcf} \
         {input.bam_file} {output.snvs_filename}
         """
 
 rule allelic_counts: 
     input:
-        ncbi2ucsc = MAE_ROOT / "resource/chr_NCBI_UCSC.txt",
-        ucsc2ncbi = MAE_ROOT / "resource/chr_UCSC_NCBI.txt",
+        ncbi2ucsc = os.path.join(SCRIPT_ROOT, "resource", "chr_NCBI_UCSC.txt"),
+        ucsc2ncbi = os.path.join(SCRIPT_ROOT, "resource", "chr_UCSC_NCBI.txt"),
         vcf_file = parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
         bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, file_type='RNA_BAM_FILE'),
-        script = MAE_ROOT / "Scripts/MAE/ASEReadCounter.sh"
+        script = os.path.join(SCRIPT_ROOT, "Scripts", "MAE", "ASEReadCounter.sh")
     output:    
         counted = parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
     shell:
@@ -61,12 +62,12 @@ rule allelic_counts:
 
 rule allelic_counts_qc: 
     input:
-        ncbi2ucsc = MAE_ROOT / "resource/chr_NCBI_UCSC.txt",
-        ucsc2ncbi = MAE_ROOT / "resource/chr_UCSC_NCBI.txt",
+        ncbi2ucsc = os.path.join(SCRIPT_ROOT, "resource", "chr_NCBI_UCSC.txt"),
+        ucsc2ncbi = os.path.join(SCRIPT_ROOT, "resource", "chr_UCSC_NCBI.txt"),
         vcf_file_ucsc = config["mae"]["qcVcf"]["UCSC"],
         vcf_file_ncbi = config["mae"]["qcVcf"]["NCBI"],
         bam_file = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, file_type='RNA_BAM_FILE'),
-        script = MAE_ROOT / "Scripts/QC/ASEReadCounter.sh"
+        script = os.path.join(SCRIPT_ROOT, "Scripts", "QC", "ASEReadCounter.sh")
     output:    
         counted = parser.getProcDataDir() + "/mae/allelic_counts_qc/{rna}.csv.gz"
     shell:
@@ -77,15 +78,15 @@ rule allelic_counts_qc:
         """
 
 
-### RULEGRAPH  
-### rulegraph only works without print statements
-
-## For rule rulegraph.. copy configfile in tmp file
+### RULEGRAPH
 import oyaml
-with open(TMP_DIR + '/config.yaml', 'w') as yaml_file:
+
+config_file = drop.getMethodPath(METHOD, link_type='config_file', tmp_dir=TMP_DIR)
+rulegraph_filename = f'{config["htmlOutputPath"]}/{METHOD}_rulegraph'
+
+with open(config_file, 'w') as yaml_file:
     oyaml.dump(config, yaml_file, default_flow_style=False)
 
-rulegraph_filename = config["htmlOutputPath"] + "/MAE_rulegraph" # htmlOutputPath + "/" + os.path.basename(os.getcwd()) + "_rulegraph"
 rule produce_rulegraph:
     input:
         expand(rulegraph_filename + ".{fmt}", fmt=["svg", "png"])
@@ -94,7 +95,7 @@ rule create_graph:
     output:
         rulegraph_filename + ".dot"
     shell:
-        "snakemake --configfile " + TMP_DIR + "/config.yaml --rulegraph > {output}"
+        "snakemake --configfile {config_file} --rulegraph > {output}"
 
 rule render_dot:
     input:
@@ -103,4 +104,3 @@ rule render_dot:
         "{prefix}.{fmt,(png|svg)}"
     shell:
         "dot -T{wildcards.fmt} < {input} > {output}"
-

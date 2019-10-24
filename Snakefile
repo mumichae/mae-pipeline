@@ -25,7 +25,7 @@ rule all:
 dirs = [parser.getProcDataDir() + "/mae/snvs", parser.getProcDataDir() + "/mae/allelic_counts"]
 for dir_ in dirs:
     if not os.path.exists(dir_):
-        os.makedirs(dirdir_)
+        os.makedirs(dir_)
         print("Created directory for MAE results: ", dir_)
 
 rule create_SNVs:

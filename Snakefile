@@ -4,7 +4,7 @@ import drop
 import pathlib
 
 parser = drop.config(config)
-config = parser.config
+config = parser.parse()
 include: config['wBuildPath'] + "/wBuild.snakefile"
 
 METHOD = 'MAE'

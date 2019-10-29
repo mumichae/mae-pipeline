@@ -8,8 +8,7 @@ config = parser.parse()
 include: config['wBuildPath'] + "/wBuild.snakefile"
 
 METHOD = 'MAE'
-SCRIPT_ROOT = drop.getMethodPath(METHOD, link_type='workdir')
-TMP_DIR = config['tmpdir']
+SCRIPT_ROOT = drop.getMethodPath(METHOD, type_='workdir')
 
 rule all:
     input: 
@@ -19,7 +18,7 @@ rule all:
             dataset=parser.mae_ids.keys(), annotation=list(config["geneAnnotation"].keys())
         ),
         parser.getProcResultsDir() + "/mae/" + config["mae"]["qcGroup"] + "/dna_rna_qc_matrix.Rds"
-    output: touch(drop.getMethodPath(METHOD, link_type='final_file', tmp_dir=TMP_DIR))
+    output: touch(drop.getMethodPath(METHOD, type_='final_file'))
 
 # create folders for mae results for rule allelic counts
 dirs = [parser.getProcDataDir() + "/mae/snvs", parser.getProcDataDir() + "/mae/allelic_counts"]
@@ -79,7 +78,7 @@ rule allelic_counts_qc:
 
 
 ### RULEGRAPH
-config_file = drop.getMethodPath(METHOD, link_type='config_file', tmp_dir=TMP_DIR)
+config_file = drop.getConfFile()
 rulegraph_filename = f'{config["htmlOutputPath"]}/{METHOD}_rulegraph'
 
 rule produce_rulegraph:

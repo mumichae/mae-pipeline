@@ -3,12 +3,13 @@ import os
 import drop
 import pathlib
 
-parser = drop.config(config)
+METHOD = 'MAE'
+SCRIPT_ROOT = drop.getMethodPath(METHOD, type_='workdir')
+
+parser = drop.config(config, METHOD)
 config = parser.parse()
 include: config['wBuildPath'] + "/wBuild.snakefile"
 
-METHOD = 'MAE'
-SCRIPT_ROOT = drop.getMethodPath(METHOD, type_='workdir')
 
 rule all:
     input: 

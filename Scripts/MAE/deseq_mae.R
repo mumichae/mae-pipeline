@@ -2,6 +2,8 @@
 #' title: Get MAE results
 #' author: vyepez
 #' wb:
+#'  params:
+#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input:
 #'   - mae_counts: '`sm parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz" `'
 #'  output:
@@ -9,15 +11,16 @@
 #'  type: script
 #'---
 
-print("Started with deseq")
-saveRDS(snakemake, paste0(snakemake@config$tmpdir,'/MAE/deseq_mae.snakemake'))
-# snakemake <- readRDS(paste0(snakemake@config$tmpdir, '/MAE/deseq_mae.snakemake'))
+saveRDS(snakemake, file.path(snakemake@params$tmpdir,'deseq_mae.snakemake'))
+# snakemake <- readRDS('.drop/tmp/MAE/deseq_mae.snakemake')
 
 suppressPackageStartupMessages({
     ## LOAD tMAE package
     devtools::load_all("tMAE")
     library(stringr)
 })
+
+message("Started with deseq")
 
 # Read mae counts
 mae_counts <- fread(snakemake@input$mae_counts, fill=TRUE)

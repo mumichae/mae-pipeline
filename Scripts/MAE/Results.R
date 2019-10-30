@@ -2,6 +2,8 @@
 #' title: MAE Results table
 #' author: vyepez
 #' wb:
+#'  params:
+#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input:
 #'   - mae_res: '`sm lambda wildcards: expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = parser.getMaeByGroup({wildcards.dataset}))`'
 #'   - gene_name_mapping: '`sm parser.getProcDataDir() + "/mae/gene_name_mapping_{annotation}.tsv"`'
@@ -13,8 +15,8 @@
 #'---
 
 #+ echo=F
-saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/mae_res_all.Rds") )
-# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/mae_res_all.Rds"))
+saveRDS(snakemake, file.path(snakemake@params$tmpdir, "mae_res_all.Rds"))
+# snakemake <- readRDS(".drop/tmp/MAE/mae_res_all.Rds")
 
 suppressPackageStartupMessages({
   library(data.table)

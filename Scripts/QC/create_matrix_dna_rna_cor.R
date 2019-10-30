@@ -6,6 +6,8 @@
 #'  - |
 #'   config["mae"]["qcIdsRNA"] = parser.all_rna_ids
 #'   config["mae"]["qcIdsWES"] = parser.getSampleIDs(file_type="DNA_VCF_FILE")
+#'  params:
+#'    - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input: 
 #'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() + "/mae/RNA_GT/{rna}.Rds", rna=parser.getRNAByGroup({wildcards.dataset}))`'
 #'    - vcf: '`sm parser.getFilePaths(file_type="DNA_VCF_FILE")`'
@@ -15,8 +17,8 @@
 #'  type: script
 #'---
 
-saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/qc_matrix.snakemake"))
-# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/qc_matrix.snakemake"))
+saveRDS(snakemake, paste0(snakemake@params$tmpdir, "qc_matrix.snakemake"))
+# snakemake <- readRDS(".drop/tmp/MAE/qc_matrix.snakemake")
 
 suppressPackageStartupMessages({
   library(VariantAnnotation)

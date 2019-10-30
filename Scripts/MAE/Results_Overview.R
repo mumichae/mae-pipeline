@@ -6,6 +6,8 @@
 #'   - |
 #'    annotations = list(config["geneAnnotation"].keys())
 #'    datasets = config["mae"]["groups"]
+#'  params:
+#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input:
 #'   - html: '`sm expand(config["htmlOutputPath"] + "/MAE/{dataset}--{annotation}_results.html", annotation=annotations, dataset=datasets)`'
 #' output:
@@ -13,8 +15,8 @@
 #'---
 
 
-saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake") )
-# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/overview.snakemake")
+saveRDS(snakemake, file.path(snakemake@params$tmpdir, "overview.snakemake") )
+# snakemake <- readRDS(".drop/tmp/MAE/overview.snakemake")
 
 groups <- names(snakemake@config$mae$groups)
 gene_annotation_names <- names(snakemake@config$geneAnnotation)

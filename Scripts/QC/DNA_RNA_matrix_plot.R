@@ -2,10 +2,8 @@
 #' title: DNA-RNA matching matrix
 #' author: vyepez
 #' wb:
-#'  params:
-#'    - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input:
-#'    - mat_qc: '`sm parser.getProcResultsDir()+"/mae/"+config["mae"]["qcGroup"]+"/dna_rna_qc_matrix.Rds"`'
+#'    - mat_qc: '`sm parser.getProcResultsDir()+"/mae/"+config["qc_group"]+"/dna_rna_qc_matrix.Rds"`'
 #' output: 
 #'   html_document:
 #'    code_folding: hide
@@ -13,8 +11,8 @@
 #'---
 
 #+echo=F
-saveRDS(snakemake, paste0(snakemake@params$tmpdir, "qc_hist.snakemake"))
-# snakemake <- readRDS(".drop/tmp/MAE/qc_hist.snakemake")
+saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/qc_hist.snakemake"))
+# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/qc_hist.snakemake"))
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -50,7 +48,6 @@ median(qc_mat[qc_mat < identityCutoff])
 sa <- fread(snakemake@config$SAMPLE_ANNOTATION)[, .(DNA_ID, RNA_ID)]
 sa[, ANNOTATED_MATCH := TRUE]
 colnames(melt_mat)[1:2] <- c('DNA_ID', 'RNA_ID')
-sa <- sa[RNA_ID %in% melt_mat$RNA_ID]
 
 
 #' ### Samples that were annotated to match but do not 

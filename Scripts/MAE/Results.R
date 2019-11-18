@@ -22,7 +22,6 @@ suppressPackageStartupMessages({
   library(tidyr)
   library(GenomicRanges)
   library(SummarizedExperiment)
-  library(dplyr)
   library(R.utils)
 })
 
@@ -57,7 +56,7 @@ rvar <- unique(res_annot[, .(aux, gene_name)])
 rvar[, N := 1:.N, by = aux]
 
 r_other <- rvar[N > 1, .(other_names = paste(gene_name, collapse = ',')), by = aux]
-res <- left_join(res_annot, r_other, by = 'aux') %>% as.data.table()
+res <- merge(res_annot, r_other, by = 'aux', sort = FALSE, all.x = TRUE) 
 res[, c('aux') := NULL]
 
 # Bring gene_name column front

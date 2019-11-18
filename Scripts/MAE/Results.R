@@ -2,8 +2,6 @@
 #' title: MAE Results table
 #' author: vyepez
 #' wb:
-#'  params:
-#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input:
 #'   - mae_res: '`sm lambda wildcards: expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = parser.getMaeByGroup({wildcards.dataset}))`'
 #'   - gene_name_mapping: '`sm parser.getProcDataDir() + "/mae/gene_name_mapping_{annotation}.tsv"`'
@@ -15,8 +13,8 @@
 #'---
 
 #+ echo=F
-saveRDS(snakemake, file.path(snakemake@params$tmpdir, "mae_res_all.Rds"))
-# snakemake <- readRDS(".drop/tmp/MAE/mae_res_all.Rds")
+saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/mae_res_all.Rds") )
+# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/mae_res_all.Rds"))
 
 suppressPackageStartupMessages({
   library(data.table)
@@ -27,7 +25,7 @@ suppressPackageStartupMessages({
   library(dplyr)
   library(R.utils)
 })
-   
+
 # Read all MAE results files
 rmae <- lapply(snakemake@input$mae_res, function(m){
   rt <- readRDS(m)
@@ -73,9 +71,9 @@ uniqueN(res$MAE_ID)
 uniqueN(res$gene_name)
 
 #' ### Subset for significant events
-allelicRatioCutoff <- snakemake@config$mae$allelicRatioCutoff
-res[, MAE := padj <= snakemake@config$mae$padjCutoff & 
-       (altRatio >= allelicRatioCutoff | altRatio <= (1-allelicRatioCutoff))] 
+allelicRatioCutoff <- snakemake@config$allelicRatioCutoff
+res[, MAE := padj <= snakemake@config$mae_padjCutoff & 
+      (altRatio >= allelicRatioCutoff | altRatio <= (1-allelicRatioCutoff))] 
 res[, MAE_ALT := MAE == TRUE & altRatio >= allelicRatioCutoff]
 
 #' Number of samples with significant MA for alternative events
@@ -96,7 +94,7 @@ res[MAE_ALT == TRUE, N_MAE_ALT := .N, by = MAE_ID]
 res[MAE_ALT == TRUE & rare == TRUE, N_MAE_ALT_RARE := .N, by = MAE_ID]
 
 rd <- unique(res[,.(MAE_ID, N, N_MAE, N_MAE_ALT, N_MAE_ALT_RARE)])
-melt_dt <- melt(rd)
+melt_dt <- melt(rd, id.vars = 'MAE_ID')
 melt_dt[variable == 'N', variable := '+10 counts']
 melt_dt[variable == 'N_MAE', variable := 'MAE']
 melt_dt[variable == 'N_MAE_ALT', variable := 'MAE for ALT']
@@ -106,7 +104,7 @@ melt_dt[variable == 'N_MAE_ALT_RARE', variable := 'MAE for ALT\n& RARE']
 #' ## Cascade plot 
 ggplot(melt_dt, aes(variable, value)) + geom_boxplot() +
   scale_y_log10() + theme_bw(base_size = 14) +
-  labs(y = 'Heterozygous SNVs per patient', x = '')
+  labs(y = 'Heterozygous SNVs per patient', x = '') + annotation_logticks(sides = "l")
 
 # Medians
 melt_dt[, .(median = median(value, na.rm = T)), by = variable]

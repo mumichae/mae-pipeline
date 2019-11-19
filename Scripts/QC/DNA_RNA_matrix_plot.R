@@ -3,7 +3,7 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'    - mat_qc: '`sm parser.getProcResultsDir()+"/mae/"+config["qc_group"]+"/dna_rna_qc_matrix.Rds"`'
+#'    - mat_qc: '`sm parser.getProcResultsDir()+"/mae/"+config["mae"]["qcGroup"]+"/dna_rna_qc_matrix.Rds"`'
 #' output: 
 #'   html_document:
 #'    code_folding: hide
@@ -46,7 +46,7 @@ median(qc_mat[qc_mat > identityCutoff])
 #' Median of not matching samples value
 median(qc_mat[qc_mat < identityCutoff])
 
-# TODO: subset for qc_group only!!!
+# TODO: subset for qcGroup only!!!
 sa <- fread(snakemake@config$SAMPLE_ANNOTATION)[, .(DNA_ID, RNA_ID)]
 sa[, ANNOTATED_MATCH := TRUE]
 colnames(melt_mat)[1:2] <- c('DNA_ID', 'RNA_ID')

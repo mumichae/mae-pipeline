@@ -9,6 +9,8 @@
 # 7 {config[mae][genome]}
 # 8 {config[mae][gatkIgnoreHeaderCheck]}
 # 9 {output.counted}
+# 10 {config[tools][bcftoolsCmd]}
+# 11 {config[tools][samtoolsCmd]}
 
 ncbi2ucsc=$1
 ucsc2ncbi=$2
@@ -19,6 +21,8 @@ rna_id=$6
 fasta=$7
 sanity=$8
 output=$9
+bcftools=${10}
+samtools=${11}
 
 tmp=$(mktemp)
 header="contig\tposition\tvariantID\trefAllele\taltAllele\t"
@@ -28,7 +32,7 @@ echo -e $header >> $tmp
 
 
 # get number of UCSC chromosomes in BAM
-bam_chr=$(samtools idxstats ${bam_file} | grep chr | wc -l)
+bam_chr=$($samtools idxstats ${bam_file} | grep chr | wc -l)
 if [ ${bam_chr} -ne 0 ]
 then
     echo "use UCSC format"
@@ -41,7 +45,7 @@ else
 fi
 
 # get unique chromosomes
-vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
+vcf_chr=$($bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
 # subset from canonical chromosomes
 chr_subset=$(comm -12  <(cut -f1 -d" " ${canonical} | sort -u) <(echo ${vcf_chr} | xargs -n1 | sort -u))
 

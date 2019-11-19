@@ -41,7 +41,7 @@ rule create_SNVs:
     shell:
         """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} {input.vcf_file} {wildcards.vcf} \
-        {input.bam_file} {output.snvs_filename}
+        {input.bam_file} {output.snvs_filename} {config[tools][bcftoolsCmd]} {config[tools][samtoolsCmd]}
         """
 
 rule allelic_counts: 
@@ -57,7 +57,8 @@ rule allelic_counts:
         """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} \
         {input.vcf_file} {wildcards.vcf} {input.bam_file} {wildcards.rna} \
-        {config[mae][genome]} {config[mae][gatkIgnoreHeaderCheck]} {output.counted}
+        {config[mae][genome]} {config[mae][gatkIgnoreHeaderCheck]} {output.counted} \
+        {config[tools][bcftoolsCmd]}
         """
 
 rule allelic_counts_qc: 
@@ -74,7 +75,8 @@ rule allelic_counts_qc:
         """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} \
         {input.vcf_file_ucsc} {input.vcf_file_ncbi} {input.bam_file} {wildcards.rna} \
-        {config[mae][genome]} {config[mae][gatkIgnoreHeaderCheck]} {output.counted}
+        {config[mae][genome]} {config[mae][gatkIgnoreHeaderCheck]} {output.counted} \
+        {config[tools][bcftoolsCmd]} {config[tools][samtoolsCmd]}
         """
 
 rulegraph_filename = f'{config["htmlOutputPath"]}/{METHOD}_rulegraph'

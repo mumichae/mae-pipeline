@@ -9,6 +9,7 @@
 # 7 {config[mae][genome]}
 # 8 {config[mae][gatkIgnoreHeaderCheck]}
 # 9 {output.counted}
+# 10 {config[tools][bcftoolsCmd]}
 
 ncbi2ucsc=$1
 ucsc2ncbi=$2
@@ -19,6 +20,7 @@ rna_id=$6
 fasta=$7
 sanity=$8
 output=$9
+bcftools=${10}
 
 tmp=$(mktemp)
 header="contig\tposition\tvariantID\trefAllele\taltAllele\t"
@@ -27,7 +29,7 @@ header+="lowBaseQDepth\trawDepth\totherBases\timproperPairs"
 echo -e $header >> $tmp
 
 # get chr format
-vcf_chr=$(bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
+vcf_chr=$($bcftools view ${vcf_file} | cut -f1 | grep -v '#' | uniq)
 if [ $(echo ${vcf_chr} | grep 'chr' | wc -l) -eq 0 ]
 then
     echo "use NCBI format"
@@ -38,7 +40,10 @@ else
 fi
 # subset from canonical chromosomes
 chr_subset=$(comm -12  <(cut -f1 -d" " ${canonical} | sort -u) <(echo ${vcf_chr} | xargs -n1 | sort -u))
-#chr_subset=$(echo $chr_subset | tr ' ' '\n' | sed -e 's/^/-L /' | tr '\n' ' ')
+echo ${vcf_file}
+echo $vcf_chr
+echo $(echo ${vcf_chr} | xargs -n1 | sort -u)
+exit 1
 
 for chr in $chr_subset
 do

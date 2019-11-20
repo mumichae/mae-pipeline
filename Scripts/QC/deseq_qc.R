@@ -16,7 +16,8 @@ saveRDS(snakemake, file.path(snakemake@params$tmpdir,'deseq_qc.snakemake'))
 
 suppressPackageStartupMessages({
   library(GenomicRanges)
-  devtools::load_all("tMAE")
+  library(tMAE)
+  #devtools::load_all("tMAE")
 })
 
 # Read MA counts for qc

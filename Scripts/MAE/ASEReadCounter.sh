@@ -40,10 +40,6 @@ else
 fi
 # subset from canonical chromosomes
 chr_subset=$(comm -12  <(cut -f1 -d" " ${canonical} | sort -u) <(echo ${vcf_chr} | xargs -n1 | sort -u))
-echo ${vcf_file}
-echo $vcf_chr
-echo $(echo ${vcf_chr} | xargs -n1 | sort -u)
-exit 1
 
 for chr in $chr_subset
 do

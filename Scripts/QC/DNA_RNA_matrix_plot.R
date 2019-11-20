@@ -3,7 +3,8 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'    - mat_qc: '`sm parser.getProcResultsDir()+"/mae/"+config["mae"]["qcGroup"]+"/dna_rna_qc_matrix.Rds"`'
+#'    - mat_qc: '`sm parser.getProcResultsDir() + "/mae/"
+#'                + config["mae"]["qcGroup"] + "/dna_rna_qc_matrix.Rds"`'
 #' output: 
 #'   html_document:
 #'    code_folding: hide
@@ -12,7 +13,7 @@
 
 #+echo=F
 saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/qc_hist.snakemake"))
-# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/qc_hist.snakemake"))
+# snakemake <- readRDS(".drop/tmp/MAE/qc_hist.snakemake")
 
 suppressPackageStartupMessages({
   library(reshape2)
@@ -25,7 +26,7 @@ suppressPackageStartupMessages({
 #' ## Plot DNA - RNA matching matrix
 qc_mat <- readRDS(snakemake@input$mat_qc)
 hist(qc_mat, xlab = '% of overlapping variants from DNA and RNA', main = '')
-melt_mat <- reshape2::melt(qc_mat)
+melt_mat <- as.data.table(reshape2::melt(qc_mat))
 
 #' Logarithmic scale of the y axis provides a better visualization
 identityCutoff <- .85
@@ -46,16 +47,16 @@ median(qc_mat[qc_mat > identityCutoff])
 #' Median of not matching samples value
 median(qc_mat[qc_mat < identityCutoff])
 
-# TODO: subset for qcGroup only!!!
-sa <- fread(snakemake@config$SAMPLE_ANNOTATION)[, .(DNA_ID, RNA_ID)]
+sa <- fread(snakemake@config$sampleAnnotation)[, .(DNA_ID, RNA_ID)]
 sa[, ANNOTATED_MATCH := TRUE]
 colnames(melt_mat)[1:2] <- c('DNA_ID', 'RNA_ID')
 
 
 #' ### Samples that were annotated to match but do not 
-sa2 <- merge(sa, melt_mat, by = c('DNA_ID', 'RNA_ID'), sort = FALSE, all.x = TRUE)
-DT::datatable(sa2[value < identityCutoff])
+false_matches <- merge(sa, melt_mat, by = c('DNA_ID', 'RNA_ID'), sort = FALSE, all.x = TRUE)
+DT::datatable(false_matches[value < identityCutoff])
 
 #' ### Samples that were not annotated to match but actually do
-sa3 <- merge(melt_mat, sa, by = c('DNA_ID', 'RNA_ID'), sort = FALSE, all.x = TRUE)
-DT::datatable(sa3[is.na(ANNOTATED_MATCH) & value > identityCutoff])
+false_mismatches <- merge(melt_mat, sa, by = c('DNA_ID', 'RNA_ID'), sort = FALSE, all.x = TRUE)
+DT::datatable(false_mismatches[is.na(ANNOTATED_MATCH) & value > identityCutoff])
+

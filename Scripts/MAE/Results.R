@@ -111,3 +111,4 @@ melt_dt[, .(median = median(value, na.rm = T)), by = variable]
 #' 
 #' ## Results table
 DT::datatable(res[MAE_ALT == TRUE], filter = 'top')
+

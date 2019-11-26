@@ -81,10 +81,12 @@ res[, MAE_ALT := MAE == TRUE & altRatio >= allelicRatioCutoff]
 uniqueN(res[MAE_ALT == TRUE, MAE_ID])
 
 #' ### Save the results
+# Save full results zipped
 unzipped_file <- unlist(strsplit(snakemake@output$res_all, split = ".gz"))
 fwrite(res, unzipped_file, sep = '\t', row.names = F, quote = F)
-gzip(unzipped_file)
-saveRDS(res, snakemake@output$res_all)
+gzip(unzipped_file, overwrite = TRUE)
+
+# Save significant results
 fwrite(res[MAE_ALT == TRUE], snakemake@output$res_signif, 
        sep = '\t', row.names = F, quote = F)
 

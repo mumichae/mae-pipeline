@@ -32,9 +32,10 @@ melt_mat <- as.data.table(reshape2::melt(qc_mat))
 identityCutoff <- .85
 
 ggplot(melt_mat, aes(value)) + geom_histogram(fill = 'cadetblue4', bins = 25) + 
-  theme_bw(base_size = 14) + labs(x = '% of matching DNA - RNA variants', y = 'Count') + 
+  theme_bw(base_size = 14) + 
+    labs(x = '% of matching DNA - RNA variants', y = 'Count') + 
   scale_y_log10()  + xlim(c(NA,1)) + annotation_logticks(sides = "l") + 
-  geom_vline(xintercept = identityCutoff, linetype = 'dashed', color = 'firebrick')
+  geom_vline(xintercept=identityCutoff, linetype='dashed', color = 'firebrick')
 
 #' ## Identify matching samples
 
@@ -53,10 +54,12 @@ colnames(melt_mat)[1:2] <- c('DNA_ID', 'RNA_ID')
 
 
 #' ### Samples that were annotated to match but do not 
-false_matches <- merge(sa, melt_mat, by = c('DNA_ID', 'RNA_ID'), sort = FALSE, all.x = TRUE)
+false_matches <- merge(sa, melt_mat, by = c('DNA_ID', 'RNA_ID'), 
+                       sort = FALSE, all.x = TRUE)
 DT::datatable(false_matches[value < identityCutoff])
 
 #' ### Samples that were not annotated to match but actually do
-false_mismatches <- merge(melt_mat, sa, by = c('DNA_ID', 'RNA_ID'), sort = FALSE, all.x = TRUE)
+false_mismatches <- merge(melt_mat, sa, by = c('DNA_ID', 'RNA_ID'), 
+                          sort = FALSE, all.x = TRUE)
 DT::datatable(false_mismatches[is.na(ANNOTATED_MATCH) & value > identityCutoff])
 

@@ -40,7 +40,8 @@ gene_annot_dt <- gene_annot_dt[seqnames %in% paste0('chr', c(1:22, 'X'))]
 gene_annot_ranges <- GRanges(seqnames = gene_annot_dt$seqnames, 
                              IRanges(start = gene_annot_dt$start, end = gene_annot_dt$end), 
                              strand = gene_annot_dt$strand)
-rmae_ranges <- GRanges(seqnames = rmae$contig, IRanges(start = rmae$position, end = rmae$position), strand = '*')
+rmae_ranges <- GRanges(seqnames = rmae$contig, 
+                       IRanges(start = rmae$position, end = rmae$position), strand = '*')
 
 fo <- findOverlaps(rmae_ranges, gene_annot_ranges)
 
@@ -48,7 +49,8 @@ fo <- findOverlaps(rmae_ranges, gene_annot_ranges)
 res_annot <- cbind(rmae[from(fo), ],  gene_annot_dt[to(fo), .(gene_name, gene_type)])
 
 # Prioritze protein coding genes
-res_annot <- rbind(res_annot[gene_type == 'protein_coding'], res_annot[gene_type != 'protein_coding'])
+res_annot <- rbind(res_annot[gene_type == 'protein_coding'], 
+                   res_annot[gene_type != 'protein_coding'])
 
 # Write all the other genes in another column
 res_annot[, aux := paste(contig, position, sep = "-")]
@@ -83,7 +85,8 @@ unzipped_file <- unlist(strsplit(snakemake@output$res_all, split = ".gz"))
 fwrite(res, unzipped_file, sep = '\t', row.names = F, quote = F)
 gzip(unzipped_file)
 saveRDS(res, snakemake@output$res_all)
-fwrite(res[MAE_ALT == TRUE], snakemake@output$res_signif, sep = '\t', row.names = F, quote = F)
+fwrite(res[MAE_ALT == TRUE], snakemake@output$res_signif, 
+       sep = '\t', row.names = F, quote = F)
 
 
 #+echo=F
@@ -103,7 +106,8 @@ melt_dt[variable == 'N_MAE_ALT_RARE', variable := 'MAE for ALT\n& RARE']
 #' ## Cascade plot 
 ggplot(melt_dt, aes(variable, value)) + geom_boxplot() +
   scale_y_log10() + theme_bw(base_size = 14) +
-  labs(y = 'Heterozygous SNVs per patient', x = '') + annotation_logticks(sides = "l")
+  labs(y = 'Heterozygous SNVs per patient', x = '') +
+    annotation_logticks(sides = "l")
 
 # Medians
 melt_dt[, .(median = median(value, na.rm = T)), by = variable]

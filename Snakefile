@@ -21,12 +21,9 @@ rule all:
         parser.getProcResultsDir() + "/mae/" + config["mae"]["qcGroup"] + "/dna_rna_qc_matrix.Rds"
     output: touch(drop.getMethodPath(METHOD, type_='final_file'))
 
-# create folders for mae results for rule allelic counts
-dirs = [parser.getProcDataDir() + "/mae/snvs", parser.getProcDataDir() + "/mae/allelic_counts"]
-for dir_ in dirs:
-    if not os.path.exists(dir_):
-        os.makedirs(dir_)
-        print("Created directory for MAE results: ", dir_)
+rule sampleQC:
+    input: rules.Scripts_QC_DNA_RNA_matrix_plot_R.output
+    output: drop.getTmpDir() + "/sampleQC.done"
 
 rule create_SNVs:
     input:

@@ -5,7 +5,7 @@
 #'  params:
 #'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input:
-#'   - qc_counts: '`sm parser.getProcDataDir() + "/mae/allelic_counts_qc/{rna}.csv.gz" `'
+#'   - qc_counts: '`sm parser.getProcDataDir() + "/mae/allelic_counts/qc_{rna}.csv.gz" `'
 #'  output:
 #'   - mae_res: '`sm parser.getProcDataDir() + "/mae/RNA_GT/{rna}.Rds"`'
 #'  type: script

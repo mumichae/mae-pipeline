@@ -19,12 +19,11 @@ output=$6
 bcftools=$7
 samtools=$8
 
-tmp=${output}_tmp
+tmp=$(mktemp)
 
 $bcftools annotate --force -x INFO ${vcf_file} |\
     $bcftools view -s ${vcf_id} -m2 -M2 -v snps -O z -o $tmp
 $bcftools index -t $tmp
-echo "wrote" $tmp
 
 # compare and correct chromosome format mismatch
 bam_chr=$($samtools idxstats ${bam_file} | grep chr | wc -l)

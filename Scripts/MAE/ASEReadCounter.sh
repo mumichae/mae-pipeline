@@ -3,24 +3,22 @@
 # 1 {input.ncbi2ucsc}
 # 2 {input.ucsc2ncbi}
 # 3 {input.vcf_file}
-# 4 {wildcards.vcf}
-# 5 {input.bam_file}
-# 6 {wildcards.rna}
-# 7 {config[mae][genome]}
-# 8 {config[mae][gatkIgnoreHeaderCheck]}
-# 9 {output.counted}
-# 10 {config[tools][bcftoolsCmd]}
+# 4 {input.bam_file}
+# 5 {wildcards.vcf}--{wildcards.rna}
+# 6 {input.fasta}
+# 7 {config[mae][gatkIgnoreHeaderCheck]}
+# 8 {output.counted}
+# 9 {config[tools][bcftoolsCmd]}
 
 ncbi2ucsc=$1
 ucsc2ncbi=$2
 vcf_file=$3
-vcf_id=$4
-bam_file=$5
-rna_id=$6
-fasta=$7
-sanity=$8
-output=$9
-bcftools=${10}
+bam_file=$4
+mae_id=$5
+fasta=$6
+sanity=$7
+output=$8
+bcftools=$9
 
 tmp=$(mktemp)
 header="contig\tposition\tvariantID\trefAllele\taltAllele\t"
@@ -54,8 +52,8 @@ do
     | tail -n+2 >> $tmp
 done
 
-cat $tmp | awk -v vcfrna="${vcf_id}--${rna_id}" \
-    -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "MAE_ID"} NR>1{print $0, vcfrna}' \
+cat $tmp | awk -v id="${mae_id}" \
+    -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "ID"} NR>1{print $0, id}' \
     | bgzip > ${output}
 
 rm ${tmp}

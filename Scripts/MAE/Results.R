@@ -3,12 +3,18 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_res: '`sm lambda wildcards: expand(parser.getProcResultsDir() + "/mae/samples/{id}_res.Rds", id = parser.getMaeByGroup({wildcards.dataset}))`'
-#'   - gene_name_mapping: '`sm parser.getProcDataDir() + "/mae/gene_name_mapping_{annotation}.tsv"`'
+#'   - mae_res: '`sm lambda wildcards: expand(parser.getProcResultsDir() + 
+#'                "/mae/samples/{id}_res.Rds",
+#'                 id = parser.getMaeByGroup({wildcards.dataset}))`'
+#'   - gene_name_mapping: '`sm parser.getProcDataDir() +
+#'                          "/mae/gene_name_mapping_{annotation}.tsv"`'
 #'  output:
-#'   - res_all: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_all_{annotation}.tsv.gz"`' 
-#'   - res_signif: '`sm parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_{annotation}.tsv"`'
-#'   - wBhtml: '`sm config["htmlOutputPath"] + "/MAE/{dataset}--{annotation}_results.html"`'
+#'   - res_all: '`sm parser.getProcResultsDir() + 
+#'                "/mae/{dataset}/MAE_results_all_{annotation}.tsv.gz"`' 
+#'   - res_signif: '`sm parser.getProcResultsDir() + 
+#'                   "/mae/{dataset}/MAE_results_{annotation}.tsv"`'
+#'   - wBhtml: '`sm config["htmlOutputPath"] +
+#'               "/MAE/{dataset}--{annotation}_results.html"`'
 #'  type: noindex
 #'---
 
@@ -66,7 +72,7 @@ res <- cbind(res[, .(gene_name)], res[, -"gene_name"])
 
 #'
 #' Total number of samples
-uniqueN(res$MAE_ID)
+uniqueN(res$ID)
 
 #' Total number of genes
 uniqueN(res$gene_name)
@@ -78,7 +84,7 @@ res[, MAE := padj <= snakemake@config$mae_padjCutoff &
 res[, MAE_ALT := MAE == TRUE & altRatio >= allelicRatioCutoff]
 
 #' Number of samples with significant MA for alternative events
-uniqueN(res[MAE_ALT == TRUE, MAE_ID])
+uniqueN(res[MAE_ALT == TRUE, ID])
 
 #' ### Save the results
 # Save full results zipped
@@ -92,13 +98,13 @@ fwrite(res[MAE_ALT == TRUE], snakemake@output$res_signif,
 
 
 #+echo=F
-res[, N := .N, by = MAE_ID]
-res[MAE == TRUE, N_MAE := .N, by = MAE_ID]
-res[MAE_ALT == TRUE, N_MAE_ALT := .N, by = MAE_ID]
-res[MAE_ALT == TRUE & rare == TRUE, N_MAE_ALT_RARE := .N, by = MAE_ID]
+res[, N := .N, by = ID]
+res[MAE == TRUE, N_MAE := .N, by = ID]
+res[MAE_ALT == TRUE, N_MAE_ALT := .N, by = ID]
+res[MAE_ALT == TRUE & rare == TRUE, N_MAE_ALT_RARE := .N, by = ID]
 
-rd <- unique(res[,.(MAE_ID, N, N_MAE, N_MAE_ALT, N_MAE_ALT_RARE)])
-melt_dt <- melt(rd, id.vars = 'MAE_ID')
+rd <- unique(res[,.(ID, N, N_MAE, N_MAE_ALT, N_MAE_ALT_RARE)])
+melt_dt <- melt(rd, id.vars = 'ID')
 melt_dt[variable == 'N', variable := '+10 counts']
 melt_dt[variable == 'N_MAE', variable := 'MAE']
 melt_dt[variable == 'N_MAE_ALT', variable := 'MAE for ALT']

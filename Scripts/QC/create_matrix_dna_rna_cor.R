@@ -9,10 +9,13 @@
 #'  params:
 #'    - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input: 
-#'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() + "/mae/RNA_GT/{rna}.Rds", rna=parser.getRNAByGroup({wildcards.dataset}))`'
+#'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() +
+#'                "/mae/RNA_GT/{rna}.Rds", 
+#'                rna=parser.getRNAByGroup({wildcards.dataset}))`'
 #'    - vcf: '`sm parser.getFilePaths(file_type="DNA_VCF_FILE")`'
 #'  output:
-#'    - mat_qc: '`sm parser.getProcResultsDir() + "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
+#'    - mat_qc: '`sm parser.getProcResultsDir() + 
+#'               "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
 #'  threads: 50
 #'  type: script
 #'---
@@ -31,7 +34,7 @@ suppressPackageStartupMessages({
 register(MulticoreParam(snakemake@threads))
 
 # Read the test vcf as GRanges
-gr_test <- readVcf(snakemake@config$mae$qcVcf$UCSC) %>% granges()
+gr_test <- readVcf(snakemake@config$mae$qcVcf) %>% granges()
 mcols(gr_test)$GT <- "0/0"
 
 # Read the vcf and rna files

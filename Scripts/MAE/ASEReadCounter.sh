@@ -52,9 +52,11 @@ do
     | tail -n+2 >> $tmp
 done
 
+echo $mae_id
 cat $tmp | awk -v id="${mae_id}" \
     -F $'\t' 'BEGIN {OFS = FS} NR==1{print $0, "ID"} NR>1{print $0, id}' \
     | bgzip > ${output}
-
 rm ${tmp}
+
+zcat ${output} | head
 

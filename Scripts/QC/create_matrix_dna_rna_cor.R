@@ -3,11 +3,10 @@
 #' author: vyepez
 #' wb:
 #'  py:
-#'  - |
-#'   config["mae"]["qcIdsRNA"] = parser.all_rna_ids
-#'   config["mae"]["qcIdsWES"] = parser.getSampleIDs(file_type="DNA_VCF_FILE")
 #'  params:
 #'    - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
+#'    - qcIdsRNA: '`sm parser.all_rna_ids`'
+#'    - qcIdsWES: '`sm parser.getSampleIDs(file_type="DNA_VCF_FILE")`'
 #'  input: 
 #'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() +
 #'                "/mae/RNA_GT/{rna}.Rds", 
@@ -39,10 +38,10 @@ mcols(gr_test)$GT <- "0/0"
 
 # Read the vcf and rna files
 input_vcf <- snakemake@input$vcf
-wes_samples <- snakemake@config$mae$qcIdsWES
+wes_samples <- snakemake@params$qcIdsWES
 
 
-rna_samples <- snakemake@config$mae$qcIdsRNA[[snakemake@wildcards$dataset]]
+rna_samples <- snakemake@params$qcIdsRNA[[snakemake@wildcards$dataset]]
 mae_res <- snakemake@input$mae_res
 
 N <- length(input_vcf)

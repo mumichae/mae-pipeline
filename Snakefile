@@ -44,13 +44,13 @@ def getScript(type, name):
 rule all:
     input: 
         rules.Index.output, 
-        expand(
-            parser.getProcResultsDir() + "/mae/{dataset}/MAE_results_{annotation}.tsv",
-            dataset=parser.mae_ids.keys(), annotation=list(config["geneAnnotation"].keys())
-        ),
-        parser.getProcResultsDir() + "/mae/" + config["mae"]["qcGroup"] + 
-        "/dna_rna_qc_matrix.Rds"
+        rules.Scripts_MAE_Overview_R.output,
+        rules.Scripts_QC_Overview_R.output
     output: touch(drop.getMethodPath(METHOD, type_='final_file'))
+
+rule sampleQC:
+    input: rules.Scripts_QC_Overview_R.output
+    output: drop.getTmpDir() + "/sampleQC.done"
 
 rule create_dict:
     input: config['mae']['genome']
@@ -134,10 +134,6 @@ rule allelic_counts_qc:
         {output.counted} {config[tools][bcftoolsCmd]} \
         {config[tools][samtoolsCmd]} {input.script_mae}
         """
-
-rule sampleQC:
-    input: rules.Scripts_QC_DNA_RNA_matrix_plot_R.output
-    output: drop.getTmpDir() + "/sampleQC.done"
 
 ####
 rulegraph_filename = f'{config["htmlOutputPath"]}/{METHOD}_rulegraph'

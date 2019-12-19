@@ -3,12 +3,11 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'    - mat_qc: '`sm parser.getProcResultsDir() + "/mae/"
-#'                + config["mae"]["qcGroup"] + "/dna_rna_qc_matrix.Rds"`'
-#' output: 
-#'   html_document:
-#'    code_folding: hide
-#'    code_download: TRUE
+#'    - mat_qc: '`sm parser.getProcResultsDir() + 
+#'               "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
+#'  output:
+#'    - wBhtml: '`sm config["htmlOutputPath"] + "/QC/{dataset}.html"`'
+#'  type: noindex
 #'---
 
 #+echo=F

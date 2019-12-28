@@ -17,7 +17,6 @@ saveRDS(snakemake, file.path(snakemake@params$tmpdir,'deseq_mae.snakemake'))
 suppressPackageStartupMessages({
     library(stringr)
     library(tMAE)
-    #devtools::load_all("tMAE")
 })
 
 message("Started with deseq")

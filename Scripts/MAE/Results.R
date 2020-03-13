@@ -31,6 +31,8 @@ suppressPackageStartupMessages({
   library(R.utils)
 })
 
+params <- snakemake@config$mae
+
 # Read all MAE results files
 rmae <- lapply(snakemake@input$mae_res, function(m){
   rt <- readRDS(m)
@@ -78,8 +80,8 @@ uniqueN(res$ID)
 uniqueN(res$gene_name)
 
 #' ### Subset for significant events
-allelicRatioCutoff <- snakemake@config$allelicRatioCutoff
-res[, MAE := padj <= snakemake@config$mae_padjCutoff & 
+allelicRatioCutoff <- params$allelicRatioCutoff
+res[, MAE := padj <= params$padjCutoff & 
       (altRatio >= allelicRatioCutoff | altRatio <= (1-allelicRatioCutoff))] 
 res[, MAE_ALT := MAE == TRUE & altRatio >= allelicRatioCutoff]
 
@@ -88,9 +90,8 @@ uniqueN(res[MAE_ALT == TRUE, ID])
 
 #' ### Save the results
 # Save full results zipped
-unzipped_file <- unlist(strsplit(snakemake@output$res_all, split = ".gz"))
-fwrite(res, unzipped_file, sep = '\t', row.names = F, quote = F)
-gzip(unzipped_file, overwrite = TRUE)
+fwrite(res, snakemake@output$res_all, sep = '\t', 
+       row.names = F, quote = F, compress = 'gzip')
 
 # Save significant results
 fwrite(res[MAE_ALT == TRUE], snakemake@output$res_signif, 

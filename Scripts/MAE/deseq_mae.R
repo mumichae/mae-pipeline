@@ -39,7 +39,7 @@ if (snakemake@config$mae$addAF == TRUE) {
   print("Adding gnomAD allele frequencies...")
   
   # obtain the assembly from the config
-  gene_assembly <- snakemake@config$geneAssembly
+  gene_assembly <- snakemake@config$genomeAssembly
   
   if(gene_assembly == 'hg19'){
     suppressPackageStartupMessages(library(MafDb.gnomAD.r2.1.hs37d5))

@@ -17,12 +17,19 @@
 saveRDS(snakemake, file.path(snakemake@params$tmpdir, "overview.snakemake") )
 # snakemake <- readRDS(".drop/tmp/MAE/overview.snakemake")
 
-groups <- names(snakemake@config$mae$groups)
+# Obtain the annotations and datasets
+datasets <- snakemake@config$mae$groups 
 gene_annotation_names <- names(snakemake@config$geneAnnotation)
 
-titles <- paste(gene_annotation_names, groups)
-summaries <- paste('[', titles ,'](', 
-                   gsub(snakemake@config$htmlOutputPath, ".", 
-                        snakemake@input$html), ')', sep = '')
-summaries <- paste(summaries, sep = '\n')
-#' Summaries:  `r summaries`
+#+ echo=FALSE, results="asis"
+devNull <- sapply(datasets, function(name){
+  sapply(gene_annotation_names, function(version){
+    cat(paste0(
+      "<h1>Dataset: ", name, "</h1>",
+      "<p>",
+      "</br>", "<a href='MAE/", name, "--", version, "_results.html'   >MAE results</a>",
+      "</br>", "</p>"
+    ))
+  })
+})
+

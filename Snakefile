@@ -44,12 +44,13 @@ def getScript(type, name):
 rule all:
     input: 
         rules.Index.output, 
-        rules.Scripts_MAE_Overview_R.output,
-        rules.Scripts_QC_Overview_R.output
+        config["htmlOutputPath"] + "/mae_readme.html",
+        rules.Scripts_MAE_Datasets_R.output,
+        rules.Scripts_QC_Datasets_R.output
     output: touch(drop.getMethodPath(METHOD, type_='final_file'))
 
 rule sampleQC:
-    input: rules.Scripts_QC_Overview_R.output
+    input: rules.Scripts_QC_Datasets_R.output
     output: drop.getTmpDir() + "/sampleQC.done"
 
 rule create_dict:

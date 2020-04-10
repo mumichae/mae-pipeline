@@ -14,10 +14,15 @@
 saveRDS(snakemake, file.path(snakemake@params$tmpdir, "overview_qc.snakemake") )
 # snakemake <- readRDS(".drop/tmp/MAE/overview_qc.snakemake")
 
-groups <- snakemake@config$mae$qcGroups
-summaries <- paste('    * [', groups ,'](', 
-                   gsub(snakemake@config$htmlOutputPath, ".", 
-                        snakemake@input$html), ')', sep = '')
-summaries <- paste(summaries, sep = '\n')
-#' Summaries:
-#' `r summaries`
+# Obtain the datasets
+datasets <- snakemake@config$mae$qcGroups 
+
+#+ echo=FALSE, results="asis"
+devNull <- sapply(datasets, function(name){
+    cat(paste0(
+      "<h1>Dataset: ", name, "</h1>",
+      "<p>",
+      "</br>", "<a href='QC/", name, ".html'   >QC overview</a>",
+      "</br>", "</p>"
+    ))
+})

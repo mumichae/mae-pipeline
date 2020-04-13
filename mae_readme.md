@@ -2,9 +2,14 @@
 
 ## Mono-Allelic Expression Module 
 
-Go to the MAE tab and click on the desired analysis group. The counting
-tab contains ...
-The QC tab contains 
+Go to the MAE tab and click on `Datasets.R`. Then, select the desired 
+analysis group. 
+It contains a cascade plot with the number of allelic counts that passed the filter 
+and were mono-allelically expressed, and the results table.
 
-MAE is computed using a negative binomail test (Kremer, Bader, et al., Nat Commun, 2017)
+Go to the QC tab and click on `Datasets.R`. Then, select the desired 
+analysis group. 
+It contains a histogram with the percentage of DNA - RNA variants, and tables containing
+the mismatches, if any.
 
+MAE is computed using a negative binomial test described in [Kremer et al, Nat Commun 2017](https://www.nature.com/articles/ncomms15824).

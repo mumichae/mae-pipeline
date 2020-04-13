@@ -1,6 +1,6 @@
 #'---
-#' title: Full MAE analysis over all datasets
-#' author: Michaela Mueller
+#' title: MAE analysis over all datasets
+#' author: 
 #' wb:
 #'  params:
 #'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'

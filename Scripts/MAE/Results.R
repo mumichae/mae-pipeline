@@ -73,22 +73,19 @@ res[, c('aux') := NULL]
 res <- cbind(res[, .(gene_name)], res[, -"gene_name"])
 
 #'
-#' Total number of samples
-uniqueN(res$ID)
+#' Number of samples: `r uniqueN(res$ID)`
+#'
+#' Number of genes: `r uniqueN(res$gene_name)`
 
-#' Total number of genes
-uniqueN(res$gene_name)
-
-#' ### Subset for significant events
+# Subset for significant events
 allelicRatioCutoff <- params$allelicRatioCutoff
 res[, MAE := padj <= params$padjCutoff & 
       (altRatio >= allelicRatioCutoff | altRatio <= (1-allelicRatioCutoff))] 
 res[, MAE_ALT := MAE == TRUE & altRatio >= allelicRatioCutoff]
 
-#' Number of samples with significant MA for alternative events
-uniqueN(res[MAE_ALT == TRUE, ID])
+#' Number of samples with significant MAE for alternative events: `r uniqueN(res[MAE_ALT == TRUE, ID])`
 
-#' ### Save the results
+### Save the results
 # Save full results zipped
 fwrite(res, snakemake@output$res_all, sep = '\t', 
        row.names = F, quote = F, compress = 'gzip')
@@ -106,10 +103,10 @@ res[MAE_ALT == TRUE & rare == TRUE, N_MAE_ALT_RARE := .N, by = ID]
 
 rd <- unique(res[,.(ID, N, N_MAE, N_MAE_ALT, N_MAE_ALT_RARE)])
 melt_dt <- melt(rd, id.vars = 'ID')
-melt_dt[variable == 'N', variable := '+10 counts']
-melt_dt[variable == 'N_MAE', variable := 'MAE']
-melt_dt[variable == 'N_MAE_ALT', variable := 'MAE for ALT']
-melt_dt[variable == 'N_MAE_ALT_RARE', variable := 'MAE for ALT\n& RARE']
+melt_dt[variable == 'N', variable := '>10 counts']
+melt_dt[variable == 'N_MAE', variable := '+MAE']
+melt_dt[variable == 'N_MAE_ALT', variable := '+MAE for ALT']
+melt_dt[variable == 'N_MAE_ALT_RARE', variable := '+MAE for ALT\n& RARE']
 
 #' 
 #' ## Cascade plot 
@@ -118,8 +115,8 @@ ggplot(melt_dt, aes(variable, value)) + geom_boxplot() +
   labs(y = 'Heterozygous SNVs per patient', x = '') +
     annotation_logticks(sides = "l")
 
-# Medians
-melt_dt[, .(median = median(value, na.rm = T)), by = variable]
+#' Median of each category
+DT::datatable(melt_dt[, .(median = median(value, na.rm = T)), by = variable])
 
 #' 
 #' ## Results table

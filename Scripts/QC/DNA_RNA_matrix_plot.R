@@ -38,19 +38,18 @@ ggplot(melt_mat, aes(value)) + geom_histogram(fill = 'cadetblue4', bins = 25) +
 
 #' ## Identify matching samples
 
-#' Number of samples that match with another
-length(qc_mat[qc_mat > identityCutoff])
-
-#' Median of matching samples value
-median(qc_mat[qc_mat > identityCutoff])
-
-#' Median of not matching samples value
-median(qc_mat[qc_mat < identityCutoff])
+#' Number of samples: `r nrow(qc_mat)`
+#' 
+#' Number of samples that match with another: `r length(qc_mat[qc_mat > identityCutoff])`
+#'
+#' Median of matching samples value: `r median(qc_mat[qc_mat > identityCutoff])`
+#'
+#' Median of not matching samples value: `r median(qc_mat[qc_mat < identityCutoff])`
+#'
 
 sa <- fread(snakemake@config$sampleAnnotation)[, .(DNA_ID, RNA_ID)]
 sa[, ANNOTATED_MATCH := TRUE]
 colnames(melt_mat)[1:2] <- c('DNA_ID', 'RNA_ID')
-
 
 #' ### Samples that were annotated to match but do not 
 false_matches <- merge(sa, melt_mat, by = c('DNA_ID', 'RNA_ID'), 

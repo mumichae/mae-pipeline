@@ -1,6 +1,6 @@
 #'---
-#' title: Full VCF-BAM Matching Analysis over All Datasets
-#' author: Michaela Mueller
+#' title: VCF-BAM Matching Analysis over All Datasets
+#' author: 
 #' wb:
 #'  params:
 #'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'

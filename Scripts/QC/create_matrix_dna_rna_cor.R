@@ -17,7 +17,7 @@
 #'  type: script
 #'---
 
-saveRDS(snakemake, paste0(snakemake@params$tmpdir, "qc_matrix.snakemake"))
+saveRDS(snakemake, file.path(snakemake@params$tmpdir, "qc_matrix.snakemake"))
 # snakemake <- readRDS(".drop/tmp/MAE/qc_matrix.snakemake")
 
 suppressPackageStartupMessages({
@@ -29,7 +29,7 @@ suppressPackageStartupMessages({
 })
 
 register(MulticoreParam(snakemake@threads))
-sa <- fread(snakemake@config$sampleAnnotation)
+sa <- fread(snakemake@config$sampleAnnotation)[1:10]
 
 # Read the test vcf as GRanges
 gr_test <- readVcf(snakemake@config$mae$qcVcf) %>% granges()
@@ -49,15 +49,25 @@ lp <- bplapply(1:N, function(i){
   
   # Read sample vcf file
   sample <- wes_samples[i]
-  param <-  ScanVcfParam(fixed=NA, info=NA, geno='GT', samples=sample, trimEmpty=TRUE) 
+  param <-  ScanVcfParam(fixed=NA, info='NT', geno='GT', samples=sample, trimEmpty=TRUE) 
   vcf_sample <- readVcf(vcf_files[i], param = param, row.names = FALSE)
   # Get GRanges and add Genotype
   gr_sample <- granges(vcf_sample)
-  gt <- geno(vcf_sample)$GT
-  gt <- gsub('0|0', '0/0', gt, fixed = TRUE)
-  gt <- gsub('0|1', '0/1', gt, fixed = TRUE)
-  gt <- gsub('1|0', '0/1', gt, fixed = TRUE)
-  gt <- gsub('1|1', '1/1', gt, fixed = TRUE)
+  
+  if(!is.null(geno(vcf_sample)$GT)){
+    gt <- geno(vcf_sample)$GT
+    gt <- gsub('0|0', '0/0', gt, fixed = TRUE)
+    gt <- gsub('0|1', '0/1', gt, fixed = TRUE)
+    gt <- gsub('1|0', '0/1', gt, fixed = TRUE)
+    gt <- gsub('1|1', '1/1', gt, fixed = TRUE)
+  } else if(!is.null(info(vcf_sample)$NT)){
+    gt <- info(vcf_sample)$NT
+    gt <- gsub('ref', '0/0', gt)
+    gt <- gsub('het', '0/1', gt)
+    gt <- gsub('hom', '1/1', gt)
+    gt <- gsub('het', NA, gt)
+  }
+  
   mcols(gr_sample)$GT <- gt
   
   # Find overlaps between test and sample

@@ -6,16 +6,14 @@
 #'  params:
 #'    - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'    - qcIdsRNA: '`sm parser.all_rna_ids`'
-#'    - qcIdsWES: '`sm parser.getSampleIDs(file_type="DNA_VCF_FILE")`'
 #'  input: 
 #'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() +
 #'                "/mae/RNA_GT/{rna}.Rds", 
 #'                rna=parser.getRNAByGroup({wildcards.dataset}))`'
-#'    - vcf: '`sm parser.getFilePaths(file_type="DNA_VCF_FILE")`'
 #'  output:
 #'    - mat_qc: '`sm parser.getProcResultsDir() + 
 #'               "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
-#'  threads: 50
+#'  threads: 20
 #'  type: script
 #'---
 
@@ -31,26 +29,28 @@ suppressPackageStartupMessages({
 })
 
 register(MulticoreParam(snakemake@threads))
+sa <- fread(snakemake@config$sampleAnnotation)
 
 # Read the test vcf as GRanges
 gr_test <- readVcf(snakemake@config$mae$qcVcf) %>% granges()
 mcols(gr_test)$GT <- "0/0"
 
-# Read the vcf and rna files
-input_vcf <- snakemake@input$vcf
-wes_samples <- snakemake@params$qcIdsWES
-
-
+# Obtain the rna and vcf files
 rna_samples <- snakemake@params$qcIdsRNA[[snakemake@wildcards$dataset]]
 mae_res <- snakemake@input$mae_res
 
-N <- length(input_vcf)
+vcf_cols <- sa[RNA_ID %in% rna_samples, .(DNA_ID, DNA_VCF_FILE)] %>% unique %>% na.omit()
+wes_samples <- vcf_cols$DNA_ID
+vcf_files <- vcf_cols$DNA_VCF_FILE
+
+
+N <- length(vcf_files)
 lp <- bplapply(1:N, function(i){
   
   # Read sample vcf file
   sample <- wes_samples[i]
   param <-  ScanVcfParam(fixed=NA, info=NA, geno='GT', samples=sample, trimEmpty=TRUE) 
-  vcf_sample <- readVcf(input_vcf[i], param = param, row.names = FALSE)
+  vcf_sample <- readVcf(vcf_files[i], param = param, row.names = FALSE)
   # Get GRanges and add Genotype
   gr_sample <- granges(vcf_sample)
   gt <- geno(vcf_sample)$GT

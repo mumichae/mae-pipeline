@@ -51,7 +51,7 @@ rule all:
 
 rule sampleQC:
     input: rules.Scripts_QC_Datasets_R.output
-    output: drop.getTmpDir() + "/sampleQC.done"
+    output: touch(drop.getTmpDir() + "/sampleQC.done")
 
 rule create_dict:
     input: config['mae']['genome']

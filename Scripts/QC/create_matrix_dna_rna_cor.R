@@ -29,7 +29,7 @@ suppressPackageStartupMessages({
 })
 
 register(MulticoreParam(snakemake@threads))
-sa <- fread(snakemake@config$sampleAnnotation)[1:10]
+sa <- fread(snakemake@config$sampleAnnotation)
 
 # Read the test vcf as GRanges
 gr_test <- readVcf(snakemake@config$mae$qcVcf) %>% granges()
@@ -65,7 +65,7 @@ lp <- bplapply(1:N, function(i){
     gt <- gsub('ref', '0/0', gt)
     gt <- gsub('het', '0/1', gt)
     gt <- gsub('hom', '1/1', gt)
-    gt <- gsub('het', NA, gt)
+    gt <- gsub('conflict', NA, gt)
   }
   
   mcols(gr_sample)$GT <- gt

@@ -65,8 +65,7 @@ lp <- bplapply(1:N, function(i){
     gt <- gsub('ref', '0/0', gt)
     gt <- gsub('het', '0/1', gt)
     gt <- gsub('hom', '1/1', gt)
-    gt <- gsub('conflict', NA, gt)
-  }
+ }
   
   mcols(gr_sample)$GT <- gt
   

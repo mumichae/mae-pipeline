@@ -1,4 +1,6 @@
-# Detection of RNA outliers Pipeline
+---
+title: Detection of RNA outliers Pipeline
+---
 
 ## Mono-Allelic Expression Module 
 

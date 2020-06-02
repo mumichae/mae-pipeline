@@ -4,7 +4,7 @@ import drop
 import pathlib
 
 METHOD = 'MAE'
-SCRIPT_ROOT = drop.getMethodPath(METHOD, type_='workdir')
+SCRIPT_ROOT = drop.getMethodPath(METHOD, type_='workdir', str_=False)
 CONF_FILE = drop.getConfFile()
 
 parser = drop.config(config, METHOD)
@@ -31,14 +31,14 @@ def getQC(format):
 
 def getChrMap(SCRIPT_ROOT, conversion):
     if conversion == 'ncbi2ucsc':
-        return pathlib.Path(SCRIPT_ROOT)/"resource"/"chr_NCBI_UCSC.txt"
+        return SCRIPT_ROOT/"resource"/"chr_NCBI_UCSC.txt"
     elif conversion == 'ucsc2ncbi':
-        return pathlib.Path(SCRIPT_ROOT)/"resource"/"chr_UCSC_NCBI.txt"
+        return SCRIPT_ROOT/"resource"/"chr_UCSC_NCBI.txt"
     else:
         raise ValueError(f"getChrMap: {conversion} is an invalid conversion option")
         
 def getScript(type, name):
-    return pathlib.Path(SCRIPT_ROOT)/"Scripts"/type/name
+    return SCRIPT_ROOT/"Scripts"/type/name
 ######
 
 rule all:

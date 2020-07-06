@@ -6,7 +6,7 @@
 #'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'  input:
 #'   - html: '`sm expand(config["htmlOutputPath"] + "/QC/{dataset}.html",
-#'             dataset=config["mae"]["qcGroups"])`'
+#'             dataset=cfg.MAE.qcGroups)`'
 #' output:
 #'  html_document
 #'---

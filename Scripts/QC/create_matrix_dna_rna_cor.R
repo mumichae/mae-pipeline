@@ -5,13 +5,12 @@
 #'  py:
 #'  params:
 #'    - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
-#'    - qcIdsRNA: '`sm parser.all_rna_ids`'
+#'    - rnaIds: '`sm lambda w: sa.getIDsByGroup(w.dataset, assay="RNA")`'
 #'  input: 
-#'    - mae_res: '`sm lambda wildcards: expand(parser.getProcDataDir() +
-#'                "/mae/RNA_GT/{rna}.Rds", 
-#'                rna=parser.getRNAByGroup({wildcards.dataset}))`'
+#'    - mae_res: '`sm lambda w: expand(cfg.getProcessedDataDir() +
+#'                "/mae/RNA_GT/{rna}.Rds", rna=sa.getIDsByGroup(w.dataset, assay="RNA"))`'
 #'  output:
-#'    - mat_qc: '`sm parser.getProcResultsDir() + 
+#'    - mat_qc: '`sm cfg.getProcessedResultsDir() + 
 #'               "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
 #'  threads: 20
 #'  type: script
@@ -36,7 +35,7 @@ gr_test <- readVcf(snakemake@config$mae$qcVcf) %>% granges()
 mcols(gr_test)$GT <- "0/0"
 
 # Obtain the rna and vcf files
-rna_samples <- snakemake@params$qcIdsRNA[[snakemake@wildcards$dataset]]
+rna_samples <- snakemake@params$rnaIds
 mae_res <- snakemake@input$mae_res
 
 vcf_cols <- sa[RNA_ID %in% rna_samples, .(DNA_ID, DNA_VCF_FILE)] %>% unique %>% na.omit()

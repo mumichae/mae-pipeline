@@ -7,8 +7,7 @@
 #'  input:
 #'   - html: '`sm expand(config["htmlOutputPath"] + 
 #'             "/MAE/{dataset}--{annotation}_results.html",
-#'              annotation=list(config["geneAnnotation"].keys()),
-#'              dataset=config["mae"]["groups"])`'
+#'              annotation=cfg.getGeneVersions(), dataset=cfg.MAE.groups)`'
 #' output:
 #'  html_document
 #'---

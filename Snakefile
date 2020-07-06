@@ -1,15 +1,18 @@
 ### SNAKEFILE MONOALLELIC EXPRESSION
 import os
 import drop
-import pathlib
+from pathlib import Path
+
+cfg = drop.config.DropConfig(config)
+sa = cfg.sampleAnnotation
+config = cfg.config # for legacy
 
 METHOD = 'MAE'
 SCRIPT_ROOT = drop.getMethodPath(METHOD, type_='workdir', str_=False)
-CONF_FILE = drop.getConfFile()
+config["scriptsPath"] = SCRIPT_ROOT
+CONF_FILE = drop.getConfFile(METHOD)
 
-parser = drop.config(config, METHOD)
-config = parser.parse()
-include: config['wBuildPath'] + "/wBuild.snakefile"
+include: drop.utils.getWBuildSnakefile()
 
 ###### FUNCTIONS ######
 def fasta_dict(fasta_file):
@@ -19,13 +22,13 @@ def getVcf(rna_id, vcf_id="qc"):
     if vcf_id == "qc":
         return config["mae"]["qcVcf"]
     else:
-        return parser.getProcDataDir() + f"/mae/snvs/{vcf_id}--{rna_id}.vcf.gz"
+        return cfg.getProcessedDataDir() + f"/mae/snvs/{vcf_id}--{rna_id}.vcf.gz"
         
 def getQC(format):
     if format == "UCSC":
         return config["mae"]["qcVcf"]
     elif format == "NCBI":
-        return parser.getProcDataDir() + "/mae/qc_vcf_ncbi.vcf.gz"
+        return cfg.processedDataDir / "mae" / "qc_vcf_ncbi.vcf.gz"
     else:
         raise ValueError(f"getQC: {format} is an invalid chromosome format")
 
@@ -63,14 +66,12 @@ rule create_SNVs:
     input:
         ncbi2ucsc = getChrMap(SCRIPT_ROOT, "ncbi2ucsc"),
         ucsc2ncbi = getChrMap(SCRIPT_ROOT, "ucsc2ncbi"),
-        vcf_file  = lambda wildcards: parser.getFilePath(sampleId=wildcards.vcf, 
-                    file_type='DNA_VCF_FILE'),
-        bam_file  = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, 
-                    file_type='RNA_BAM_FILE'),
+        vcf_file  = lambda w: sa.getFilePath(w.vcf, 'DNA_VCF_FILE'),
+        bam_file  = lambda w: sa.getFilePath(w.rna, 'RNA_BAM_FILE'),
         script    = getScript("MAE", "filterSNVs.sh")
     output:
-        snvs_filename=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz",
-        snvs_index=parser.getProcDataDir() + "/mae/snvs/{vcf}--{rna}.vcf.gz.tbi"
+        snvs_filename=cfg.processedDataDir / "mae" / "snvs" / "{vcf}--{rna}.vcf.gz",
+        snvs_index=cfg.processedDataDir / "/mae" / "snvs" / "{vcf}--{rna}.vcf.gz.tbi"
     shell:
         """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} {input.vcf_file} \
@@ -82,14 +83,13 @@ rule allelic_counts:
     input:
         ncbi2ucsc = getChrMap(SCRIPT_ROOT, "ncbi2ucsc"),
         ucsc2ncbi = getChrMap(SCRIPT_ROOT, "ucsc2ncbi"),
-        vcf_file  = lambda wildcards: getVcf(wildcards.rna, wildcards.vcf),
-        bam_file  = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, 
-                    file_type='RNA_BAM_FILE'),
+        vcf_file  = lambda w: getVcf(w.rna, w.vcf),
+        bam_file  = lambda w: sa.getFilePath(w.rna, 'RNA_BAM_FILE'),
         fasta     = config['mae']['genome'],
         dict      = fasta_dict(config['mae']['genome']),
         script    = getScript("MAE", "ASEReadCounter.sh")
     output:    
-        counted = parser.getProcDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz"
+        counted = cfg.processedDataDir / "mae" / "allelic_counts" / "{vcf}--{rna}.csv.gz"
     shell:
         """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} \
@@ -119,14 +119,13 @@ rule allelic_counts_qc:
         ucsc2ncbi = getChrMap(SCRIPT_ROOT, "ucsc2ncbi"),
         vcf_file_ucsc = getQC(format="UCSC"),
         vcf_file_ncbi = getQC(format="NCBI"),
-        bam_file      = lambda wildcards: parser.getFilePath(sampleId=wildcards.rna, 
-                        file_type='RNA_BAM_FILE'),
+        bam_file      = lambda w: sa.getFilePath(w.rna, 'RNA_BAM_FILE'),
         fasta         = config['mae']['genome'],
         dict          = fasta_dict(config['mae']['genome']),
         script_qc = getScript("QC", "ASEReadCounter.sh"),
         script_mae = getScript("MAE", "ASEReadCounter.sh")
     output:    
-        counted = parser.getProcDataDir() + "/mae/allelic_counts/qc_{rna}.csv.gz"
+        counted = cfg.processedDataDir / "mae" / "allelic_counts" / "qc_{rna}.csv.gz"
     shell:
         """
         {input.script_qc} {input.ncbi2ucsc} {input.ucsc2ncbi} \

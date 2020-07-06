@@ -3,7 +3,7 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'    - mat_qc: '`sm parser.getProcResultsDir() + 
+#'    - mat_qc: '`sm cfg.getProcessedResultsDir() + 
 #'               "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
 #'  output:
 #'    - wBhtml: '`sm config["htmlOutputPath"] + "/QC/{dataset}.html"`'

@@ -3,15 +3,14 @@
 #' author: vyepez
 #' wb:
 #'  input:
-#'   - mae_res: '`sm lambda wildcards: expand(parser.getProcResultsDir() + 
-#'                "/mae/samples/{id}_res.Rds",
-#'                 id = parser.getMaeByGroup({wildcards.dataset}))`'
-#'   - gene_name_mapping: '`sm parser.getProcDataDir() +
+#'   - mae_res: '`sm lambda w: expand(cfg.getProcessedResultsDir() + 
+#'                "/mae/samples/{id}_res.Rds", id=cfg.MAE.getMaeByGroup({w.dataset}))`'
+#'   - gene_name_mapping: '`sm cfg.getProcessedDataDir() +
 #'                          "/mae/gene_name_mapping_{annotation}.tsv"`'
 #'  output:
-#'   - res_all: '`sm parser.getProcResultsDir() + 
+#'   - res_all: '`sm cfg.getProcessedResultsDir() + 
 #'                "/mae/{dataset}/MAE_results_all_{annotation}.tsv.gz"`' 
-#'   - res_signif: '`sm parser.getProcResultsDir() + 
+#'   - res_signif: '`sm cfg.getProcessedResultsDir() + 
 #'                   "/mae/{dataset}/MAE_results_{annotation}.tsv"`'
 #'   - wBhtml: '`sm config["htmlOutputPath"] +
 #'               "/MAE/{dataset}--{annotation}_results.html"`'

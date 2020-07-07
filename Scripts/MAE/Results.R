@@ -19,8 +19,8 @@
 #'---
 
 #+ echo=F
-saveRDS(snakemake, paste0(snakemake@config$tmpdir, "/MAE/mae_res_all.Rds") )
-# snakemake <- readRDS(paste0(snakemake@config$tmpdir, "/MAE/mae_res_all.Rds"))
+saveRDS(snakemake, file.path(snakemake@config$tmpdir, "/MAE/mae_res_all.snakemake"))
+# snakemake <- readRDS(".drop/tmp/MAE/mae_res_all.snakemake")
 
 suppressPackageStartupMessages({
   library(data.table)
@@ -38,7 +38,7 @@ rmae <- lapply(snakemake@input$mae_res, function(m){
   rt <- readRDS(m)
   return(rt)
 }) %>% rbindlist()
-
+rmae[, aux := paste(contig, position, sep = "-")]
 
 # Add gene names
 gene_annot_dt <- fread(snakemake@input$gene_name_mapping)
@@ -56,21 +56,29 @@ fo <- findOverlaps(rmae_ranges, gene_annot_ranges)
 # Add the gene names
 res_annot <- cbind(rmae[from(fo), ],  gene_annot_dt[to(fo), .(gene_name, gene_type)])
 
-# Prioritze protein coding genes
+# Prioritize protein coding genes
 res_annot <- rbind(res_annot[gene_type == 'protein_coding'], 
                    res_annot[gene_type != 'protein_coding'])
 
 # Write all the other genes in another column
-res_annot[, aux := paste(contig, position, sep = "-")]
 rvar <- unique(res_annot[, .(aux, gene_name)])
 rvar[, N := 1:.N, by = aux]
 
 r_other <- rvar[N > 1, .(other_names = paste(gene_name, collapse = ',')), by = aux]
-res <- merge(res_annot, r_other, by = 'aux', sort = FALSE, all.x = TRUE) 
-res[, c('aux') := NULL]
+res <- merge(res_annot, r_other, by = 'aux', sort = FALSE, all.x = TRUE)
+res <- res[, .SD[1], by = .(aux, ID)]
+res <- rbind(res, rmae[! aux %in% res$aux], fill = TRUE)
+
+# Change rare if variant frequency is higher than threshold
+res[, Nvar := .N, by = aux]
+varsCohort <- params$maxVarFreqCohort * length(snakemake@input$mae_res)
+res[Nvar > varsCohort, rare := FALSE]
+
+res[, aux := NULL]
 
 # Bring gene_name column front
 res <- cbind(res[, .(gene_name)], res[, -"gene_name"])
+setorder(res, contig, position)
 
 #'
 #' Number of samples: `r uniqueN(res$ID)`
@@ -98,15 +106,19 @@ fwrite(res[MAE_ALT == TRUE], snakemake@output$res_signif,
 #+echo=F
 res[, N := .N, by = ID]
 res[MAE == TRUE, N_MAE := .N, by = ID]
+res[MAE == TRUE & MAE_ALT == FALSE, N_MAE_REF := .N, by = ID]
 res[MAE_ALT == TRUE, N_MAE_ALT := .N, by = ID]
+res[MAE == TRUE & MAE_ALT == FALSE & rare == TRUE, N_MAE_REF_RARE := .N, by = ID]
 res[MAE_ALT == TRUE & rare == TRUE, N_MAE_ALT_RARE := .N, by = ID]
 
-rd <- unique(res[,.(ID, N, N_MAE, N_MAE_ALT, N_MAE_ALT_RARE)])
+rd <- unique(res[,.(ID, N, N_MAE, N_MAE_REF, N_MAE_ALT, N_MAE_REF_RARE, N_MAE_ALT_RARE)])
 melt_dt <- melt(rd, id.vars = 'ID')
 melt_dt[variable == 'N', variable := '>10 counts']
 melt_dt[variable == 'N_MAE', variable := '+MAE']
-melt_dt[variable == 'N_MAE_ALT', variable := '+MAE for ALT']
-melt_dt[variable == 'N_MAE_ALT_RARE', variable := '+MAE for ALT\n& RARE']
+melt_dt[variable == 'N_MAE_REF', variable := '+MAE for\nREF']
+melt_dt[variable == 'N_MAE_ALT', variable := '+MAE for\nALT']
+melt_dt[variable == 'N_MAE_REF_RARE', variable := '+MAE for REF\n& rare']
+melt_dt[variable == 'N_MAE_ALT_RARE', variable := '+MAE for ALT\n& rare']
 
 #' 
 #' ## Cascade plot 

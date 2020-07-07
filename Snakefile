@@ -9,7 +9,6 @@ config = cfg.config # for legacy
 
 METHOD = 'MAE'
 SCRIPT_ROOT = drop.getMethodPath(METHOD, type_='workdir', str_=False)
-config["scriptsPath"] = SCRIPT_ROOT
 CONF_FILE = drop.getConfFile(METHOD)
 
 include: drop.utils.getWBuildSnakefile()
@@ -71,7 +70,7 @@ rule create_SNVs:
         script    = getScript("MAE", "filterSNVs.sh")
     output:
         snvs_filename=cfg.processedDataDir / "mae" / "snvs" / "{vcf}--{rna}.vcf.gz",
-        snvs_index=cfg.processedDataDir / "/mae" / "snvs" / "{vcf}--{rna}.vcf.gz.tbi"
+        snvs_index=cfg.processedDataDir / "mae" / "snvs" / "{vcf}--{rna}.vcf.gz.tbi"
     shell:
         """
         {input.script} {input.ncbi2ucsc} {input.ucsc2ncbi} {input.vcf_file} \

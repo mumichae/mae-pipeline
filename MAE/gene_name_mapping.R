@@ -2,8 +2,8 @@
 #' title: Create GeneID-GeneName mapping
 #' author: mumichae
 #' wb:
-#'  params:
-#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
+#'  log:
+#'   - snakemake: '`sm str(tmp_dir / "MAE" / "{annotation}.Rds")`'
 #'  input:
 #'   - gtf: '`sm lambda w: cfg.getGeneAnnotationFile(w.annotation) `'
 #'  output:
@@ -11,8 +11,7 @@
 #'  type: script
 #'---
 
-saveRDS(snakemake,  file.path(snakemake@params$tmpdir, "gene_map.snakemake"))
-# snakemake <- readRDS(file.path(snakemake@params$tmpdir, "gene_map.snakemake"))
+saveRDS(snakemake, snakemake@log$snakemake)
 
 suppressPackageStartupMessages({
   library(rtracklayer)

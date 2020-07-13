@@ -2,8 +2,8 @@
 #' title: MAE test on qc variants
 #' author: vyepez
 #' wb:
-#'  params:
-#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
+#'  log:
+#'   - snakemake: '`sm str(tmp_dir / "MAE" / "deseq" / "qc_{rna}.Rds")`'
 #'  input:
 #'   - qc_counts: '`sm cfg.getProcessedDataDir() + "/mae/allelic_counts/qc_{rna}.csv.gz" `'
 #'  output:
@@ -11,8 +11,7 @@
 #'  type: script
 #'---
 
-saveRDS(snakemake, file.path(snakemake@params$tmpdir,'deseq_qc.snakemake'))
-# snakemake <- readRDS('.drop/tmp/MAE/deseq_qc.snakemake')
+saveRDS(snakemake, snakemake@log$snakemake)
 
 suppressPackageStartupMessages({
   library(GenomicRanges)

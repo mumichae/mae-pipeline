@@ -2,8 +2,8 @@
 #' title: DNA-RNA matching matrix
 #' author: vyepez
 #' wb:
-#'  params:
-#'    - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
+#'  log:
+#'   - snakemake: '`sm str(tmp_dir / "MAE" / "{dataset}" / "QC_matrix_plot.Rds")`'
 #'  input:
 #'    - mat_qc: '`sm cfg.getProcessedResultsDir() + 
 #'               "/mae/{dataset}/dna_rna_qc_matrix.Rds"`'
@@ -13,8 +13,7 @@
 #'---
 
 #+echo=F
-saveRDS(snakemake, file.path(snakemake@params$tmpdir, "qc_hist.snakemake"))
-# snakemake <- readRDS(".drop/tmp/MAE/qc_hist.snakemake")
+saveRDS(snakemake, snakemake@log$snakemake)
 
 suppressPackageStartupMessages({
   library(reshape2)

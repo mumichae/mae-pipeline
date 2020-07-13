@@ -2,8 +2,8 @@
 #' title: VCF-BAM Matching Analysis over All Datasets
 #' author: 
 #' wb:
-#'  params:
-#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
+#'  log:
+#'   - snakemake: '`sm str(tmp_dir / "MAE" / "QC_overview.Rds")`'
 #'  input:
 #'   - html: '`sm expand(config["htmlOutputPath"] + "/QC/{dataset}.html",
 #'             dataset=cfg.MAE.qcGroups)`'
@@ -11,8 +11,7 @@
 #'  html_document
 #'---
 
-saveRDS(snakemake, file.path(snakemake@params$tmpdir, "overview_qc.snakemake") )
-# snakemake <- readRDS(".drop/tmp/MAE/overview_qc.snakemake")
+saveRDS(snakemake, snakemake@log$snakemake)
 
 # Obtain the datasets
 datasets <- snakemake@config$mae$qcGroups 

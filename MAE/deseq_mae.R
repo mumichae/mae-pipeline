@@ -1,9 +1,9 @@
 #'---
 #' title: Get MAE results
-#' author: vyepez
+#' author: vyepez, mumichae
 #' wb:
-#'  params:
-#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
+#'  log:
+#'   - snakemake: '`sm str(tmp_dir / "MAE" / "deseq" / "{vcf}--{rna}.Rds")`'
 #'  input:
 #'   - mae_counts: '`sm cfg.getProcessedDataDir() + "/mae/allelic_counts/{vcf}--{rna}.csv.gz" `'
 #'  output:
@@ -11,8 +11,7 @@
 #'  type: script
 #'---
 
-saveRDS(snakemake, file.path(snakemake@params$tmpdir,'deseq_mae.snakemake'))
-# snakemake <- readRDS('.drop/tmp/MAE/deseq_mae.snakemake')
+saveRDS(snakemake, snakemake@log$snakemake)
 
 suppressPackageStartupMessages({
     library(stringr)

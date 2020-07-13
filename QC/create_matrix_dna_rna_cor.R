@@ -2,9 +2,9 @@
 #' title: Create QC matrix
 #' author: vyepez
 #' wb:
-#'  py:
+#'  log:
+#'   - snakemake: '`sm str(tmp_dir / "MAE" / "{dataset}" / "QC_matrix.Rds")`'
 #'  params:
-#'    - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
 #'    - rnaIds: '`sm lambda w: sa.getIDsByGroup(w.dataset, assay="RNA")`'
 #'  input: 
 #'    - mae_res: '`sm lambda w: expand(cfg.getProcessedDataDir() +
@@ -16,8 +16,7 @@
 #'  type: script
 #'---
 
-saveRDS(snakemake, file.path(snakemake@params$tmpdir, "qc_matrix.snakemake"))
-# snakemake <- readRDS(".drop/tmp/MAE/qc_matrix.snakemake")
+saveRDS(snakemake, snakemake@log$snakemake)
 
 suppressPackageStartupMessages({
   library(VariantAnnotation)

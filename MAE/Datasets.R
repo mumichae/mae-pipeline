@@ -2,19 +2,17 @@
 #' title: MAE analysis over all datasets
 #' author: 
 #' wb:
-#'  params:
-#'   - tmpdir: '`sm drop.getMethodPath(METHOD, "tmp_dir")`'
+#'  log:
+#'    - snakemake: '`sm str(tmp_dir / "MAE" / "overview.Rds")`'
 #'  input:
-#'   - html: '`sm expand(config["htmlOutputPath"] + 
+#'    - html: '`sm expand(config["htmlOutputPath"] + 
 #'             "/MAE/{dataset}--{annotation}_results.html",
 #'              annotation=cfg.getGeneVersions(), dataset=cfg.MAE.groups)`'
 #' output:
 #'  html_document
 #'---
 
-
-saveRDS(snakemake, file.path(snakemake@params$tmpdir, "overview.snakemake") )
-# snakemake <- readRDS(".drop/tmp/MAE/overview.snakemake")
+saveRDS(snakemake, snakemake@log$snakemake)
 
 # Obtain the annotations and datasets
 datasets <- snakemake@config$mae$groups 
